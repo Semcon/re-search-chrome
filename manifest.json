@@ -4,6 +4,9 @@
   "name": "Image search extension",
   "description": "This extension shows a Google Image search result for the current page",
   "version": "1.0",
+  "browser_action": {
+    "default_popup": "popup.html"
+  },
 
   "content_scripts": [
     {
@@ -13,6 +16,11 @@
   ],
   "permissions": [
     "activeTab",
-    "tabs"
-  ]
+    "tabs",
+    "http://*/*", "https://*/*",
+    "storage"
+  ],
+  "background": {
+    "scripts": ["background.js"]
+  }
 }
