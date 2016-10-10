@@ -1,5 +1,5 @@
 var runState;
-var first = true;
+var runInit = true;
 
 function outputText( text ){
     if(runState === 'enabled'){
@@ -14,7 +14,7 @@ function outputText( text ){
 function init(){
   let elements = document.querySelectorAll('.gsfi');
   if( elements.length === 0 ){
-    setTimeout( getSearchTerm, 100 );
+    setTimeout( init, 100 );
     return false;
   }
   var element = elements[ 0 ];
@@ -40,7 +40,7 @@ if( document.readyState === 'complete' ){
       if(runState === 'enabled'){
         console.log('in runstate equals enabled');
         init();
-        first = false;
+        runInit = false;
       }
       else if(runState === 'disabled'){
         console.log('runState is not enabled');
@@ -63,8 +63,9 @@ chrome.runtime.onMessage.addListener(
 
       if( document.readyState === 'complete' ){
           console.log('document is complete');
-          if(first === true){
+          if(runInit === true){
               init();
+              runInit = false;
           }
       }
       sendResponse({message: 'received enabled'});
