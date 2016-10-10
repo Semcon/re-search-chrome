@@ -1,15 +1,17 @@
 var runState;
-
+var first = true;
 
 function outputText( text ){
-    console.log( text );
-    var para = document.createElement("P");
-    var t = document.createTextNode( text );
-    para.appendChild(t);
-    document.body.appendChild(para);
+    if(runState === 'enabled'){
+      console.log( text );
+      var para = document.createElement("P");
+      var t = document.createTextNode( text );
+      para.appendChild(t);
+      document.body.appendChild(para);
+    }
 }
 
-function getSearchTerm(){
+function init(){
   let elements = document.querySelectorAll('.gsfi');
   if( elements.length === 0 ){
     setTimeout( getSearchTerm, 100 );
@@ -37,7 +39,8 @@ if( document.readyState === 'complete' ){
 
       if(runState === 'enabled'){
         console.log('in runstate equals enabled');
-        getSearchTerm();
+        init();
+        first = false;
       }
       else if(runState === 'disabled'){
         console.log('runState is not enabled');
@@ -60,7 +63,9 @@ chrome.runtime.onMessage.addListener(
 
       if( document.readyState === 'complete' ){
           console.log('document is complete');
-          getSearchTerm();
+          if(first === true){
+              init();
+          }
       }
       sendResponse({message: 'received enabled'});
     }
