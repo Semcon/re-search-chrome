@@ -43,6 +43,7 @@ chrome.runtime.onMessage.addListener(
               console.log(response.message);
             });
           });
+          sendResponse({runState: val});
         });
       }
       else if(val === 'disabled'){
@@ -54,6 +55,7 @@ chrome.runtime.onMessage.addListener(
                 console.log(response.message);
             });
           });
+          sendResponse({runState: val});
         });
       }
     }

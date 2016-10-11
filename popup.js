@@ -1,6 +1,14 @@
 function clickHandler(e) {
     chrome.extension.sendMessage({runState: "changeState"}, function(response) {
-  //      this.close(); // close the popup when the background finishes processing request
+      console.log("Run state is: " , response.runState);
+      var runState = response.runState;
+      if(runState === 'enabled'){
+        document.getElementById("click-me").innerHTML = 'ON';
+      }
+      else if(runState === 'disabled'){
+        document.getElementById("click-me").innerHTML = 'OFF';
+      }
+      console.log('after setting innerhtml');
     });
 }
 
