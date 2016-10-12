@@ -94,6 +94,7 @@ chrome.runtime.onMessage.addListener(
           return true;
         }
       }
+      sendResponse({selector: false});
     }
 
     //content script is sending terms

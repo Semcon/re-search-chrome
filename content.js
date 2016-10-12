@@ -1,5 +1,6 @@
 var runState;
 var runInit = true;
+var elements;
 
 function outputText( text ){
     if(runState === 'enabled'){
@@ -10,24 +11,32 @@ function outputText( text ){
     }
 }
 
+function getSearchTerm(selector){
+  console.log('Selector: ', selector);
+  elements = document.querySelectorAll(selector);
+  if( elements.length === 0 ){
+    setTimeout( init, 100 );
+    return false;
+  }
+  var element = elements[ 0 ];
+
+  if( element.value.length > 0 ){
+     outputText( element.value );
+  }
+ element.addEventListener( 'input', function( event ){
+     outputText( event.target.value );
+  });
+}
+
 function init(){
   console.log('In init');
-  let elements;
   chrome.runtime.sendMessage({searchEngine: "searchEngine", url: window.location.href}, function(response) {
-    console.log('selector is: ' , response.selector);
-    elements = document.querySelectorAll(response.selector);
-    if( elements.length === 0 ){
-      setTimeout( init, 100 );
-      return false;
+    if(response.selector !== false){
+      getSearchTerm(response.selector);
     }
-    var element = elements[ 0 ];
-
-    if( element.value.length > 0 ){
-       outputText( element.value );
+    else{
+      console.log('Search engine not found');
     }
-   element.addEventListener( 'input', function( event ){
-       outputText( event.target.value );
-    });
   });
 }
 
