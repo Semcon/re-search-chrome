@@ -1,6 +1,14 @@
 
 
 var val ="";
+var jsonTermsGoogle;
+var jsonTermsBing;
+var googleURL;
+var bingURL;
+var currentTerms;
+var currentURL;
+var jsonData;
+
 //chrome.storage.sync.clear();
 
 //First time running script to check what value runState is in chrome storage.
@@ -9,28 +17,91 @@ chrome.storage.sync.get("runState", function(data) {
   val = data.runState;
   console.log('val: ', val);
   if(typeof val === 'undefined'){
-    console.log('value is undefined');
     chrome.storage.sync.set({'runState': 'enabled'}, function () {
       console.log('Saved', 'runState', 'enabled');
       val = 'enabled';
-      console.log('val: ', val);
     });
   }
   return true;
 });
 
 
+var xhr = new XMLHttpRequest();
+xhr.open("GET", "https://api.myjson.com/bins/4we1m", true);
+xhr.onreadystatechange = function() {
+  if (xhr.readyState == 4) {
+    jsonData = JSON.parse(xhr.responseText);
+  }
+}
+xhr.send();
+
+
+function showWindows(request){
+  var link = currentURL + currentTerms[request];
+  console.log('Link: ' , link);
+    chrome.windows.getCurrent( {}, function( window ){
+        console.log( window );
+        chrome.windows.create( {
+          height: window.height,
+          left: window.width / 2 + 8,
+          state: 'normal',
+          top: 0,
+          type: 'normal',
+          url: link,
+          width: window.width / 2 + 8
+        } );
+
+        chrome.windows.update( window.id, {
+          height: window.height,
+          state: 'normal',
+          width: window.width / 2 + 8
+        } );
+    });
+}
+
+
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
-    //From content script
+    //content script asks if extension is on/off
     if (request.runState === '?'){
       chrome.storage.sync.get("runState", function(data) {
-        console.log('Value after getting it again: ', data.runState);
         val = data.runState;
-        console.log('response: ', val);
         sendResponse({runState: val});
       });
     }
+
+    //content script is asking for search engine
+    else if(request.searchEngine === 'searchEngine'){
+      var url = request.url;
+      // Loop over all engines
+      for( let i = 0; i < jsonData.engines.length; i = i + 1 ){
+        let matchCount = 0;
+
+        // Loop over all required matches for the engine
+        for( let matchIndex = 0; matchIndex < jsonData.engines[ i ].match.length; matchIndex = matchIndex + 1 ){
+          if( url.indexOf( jsonData.engines[ i ].match[ matchIndex ] ) > -1 ){
+            // We have a match, increment our counter
+            matchCount = matchCount + 1;
+          }
+        }
+
+        // If we have the same number of matches as required matches we have a valid site
+        if( matchCount === jsonData.engines[ i ].match.length ){
+          console.log( 'Valid site' );
+          sendResponse({selector: jsonData.engines[i].selector});
+          currentTerms = jsonData.engines[i].terms;
+          currentURL = jsonData.engines[i].url;
+          return true;
+        }
+      }
+    }
+
+    //content script is sending terms
+    else if(typeof currentTerms !== 'undefined' && currentTerms.hasOwnProperty(request)){
+      console.log('term is found');
+      showWindows(request);
+    }
+
     //From popup
     else if(request.runState === 'changeState'){
       console.log('ChangeState from popup / current value is: ' , val);

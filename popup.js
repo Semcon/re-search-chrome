@@ -8,7 +8,6 @@ function clickHandler(e) {
       else if(runState === 'disabled'){
         document.getElementById("click-me").innerHTML = 'OFF';
       }
-      console.log('after setting innerhtml');
     });
 }
 

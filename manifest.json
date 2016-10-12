@@ -2,7 +2,7 @@
   "manifest_version": 2,
 
   "name": "Image search extension",
-  "description": "This extension shows a Google Image search result for the current page",
+  "description": "This extension shows an alternative result when doing a Google or Bing image search.",
   "version": "1.0",
   "browser_action": {
     "default_popup": "popup.html"
@@ -21,6 +21,7 @@
     "storage"
   ],
   "background": {
-    "scripts": ["background.js"]
+    "scripts": ["background.js"],
+    "persistent": false
   }
 }

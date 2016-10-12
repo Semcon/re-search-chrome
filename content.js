@@ -3,28 +3,31 @@ var runInit = true;
 
 function outputText( text ){
     if(runState === 'enabled'){
-      console.log( text );
-      var para = document.createElement("P");
-      var t = document.createTextNode( text );
-      para.appendChild(t);
-      document.body.appendChild(para);
+      console.log( 'Sending', text );
+      chrome.runtime.sendMessage( text, function(response) {
+         //callback
+      });
     }
 }
 
 function init(){
-  let elements = document.querySelectorAll('.gsfi');
-  if( elements.length === 0 ){
-    setTimeout( init, 100 );
-    return false;
-  }
-  var element = elements[ 0 ];
+  console.log('In init');
+  let elements;
+  chrome.runtime.sendMessage({searchEngine: "searchEngine", url: window.location.href}, function(response) {
+    console.log('selector is: ' , response.selector);
+    elements = document.querySelectorAll(response.selector);
+    if( elements.length === 0 ){
+      setTimeout( init, 100 );
+      return false;
+    }
+    var element = elements[ 0 ];
 
-  if( element.value.length > 0 ){
-     outputText( element.value );
-  }
-
- element.addEventListener( 'input', function( event ){
-     outputText( event.target.value );
+    if( element.value.length > 0 ){
+       outputText( element.value );
+    }
+   element.addEventListener( 'input', function( event ){
+       outputText( event.target.value );
+    });
   });
 }
 
@@ -37,7 +40,7 @@ if( document.readyState === 'complete' ){
       runState = response.runState;
       console.log('runState in contentscript: ', runState);
 
-      if(runState === 'enabled'){
+      if(runState === 'enabled' && runInit === true){
         console.log('in runstate equals enabled');
         init();
         runInit = false;
