@@ -9,7 +9,7 @@ var currentTerms;
 var currentURL;
 var jsonData;
 
-//chrome.storage.sync.clear();
+
 
 //First time running script to check what value runState is in chrome storage.
 //If runState is undefined it is gets set to enabled otherwise it gets the value.
@@ -74,27 +74,31 @@ chrome.runtime.onMessage.addListener(
     else if(request.searchEngine === 'searchEngine'){
       var url = request.url;
       // Loop over all engines
-      for( var i = 0; i < jsonData.engines.length; i = i + 1 ){
-        var matchCount = 0;
+      if(jsonData !== null){
+        for( var i = 0; i < jsonData.engines.length; i = i + 1 ){
+          var matchCount = 0;
 
-        // Loop over all required matches for the engine
-        for( var matchIndex = 0; matchIndex < jsonData.engines[ i ].match.length; matchIndex = matchIndex + 1 ){
-          if( url.indexOf( jsonData.engines[ i ].match[ matchIndex ] ) > -1 ){
-            // We have a match, increment our counter
-            matchCount = matchCount + 1;
+          // Loop over all required matches for the engine
+          for( var matchIndex = 0; matchIndex < jsonData.engines[ i ].match.length; matchIndex = matchIndex + 1 ){
+            if( url.indexOf( jsonData.engines[ i ].match[ matchIndex ] ) > -1 ){
+              // We have a match, increment our counter
+              console.log('found match incrementing');
+              matchCount = matchCount + 1;
+            }
+          }
+
+          // If we have the same number of matches as required matches we have a valid site
+          if( matchCount === jsonData.engines[ i ].match.length ){
+            console.log( 'Valid site' );
+            sendResponse({selector: jsonData.engines[i].selector});
+            currentTerms = jsonData.engines[i].terms;
+            currentURL = jsonData.engines[i].url;
+            return true;
           }
         }
-
-        // If we have the same number of matches as required matches we have a valid site
-        if( matchCount === jsonData.engines[ i ].match.length ){
-          console.log( 'Valid site' );
-          sendResponse({selector: jsonData.engines[i].selector});
-          currentTerms = jsonData.engines[i].terms;
-          currentURL = jsonData.engines[i].url;
-          return true;
-        }
-      }
-      sendResponse({selector: false});
+        console.log('Url:' , url);
+        sendResponse({selector: false});
+      }    
     }
 
     //content script is sending terms
