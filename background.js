@@ -74,11 +74,11 @@ chrome.runtime.onMessage.addListener(
     else if(request.searchEngine === 'searchEngine'){
       var url = request.url;
       // Loop over all engines
-      for( let i = 0; i < jsonData.engines.length; i = i + 1 ){
-        let matchCount = 0;
+      for( var i = 0; i < jsonData.engines.length; i = i + 1 ){
+        var matchCount = 0;
 
         // Loop over all required matches for the engine
-        for( let matchIndex = 0; matchIndex < jsonData.engines[ i ].match.length; matchIndex = matchIndex + 1 ){
+        for( var matchIndex = 0; matchIndex < jsonData.engines[ i ].match.length; matchIndex = matchIndex + 1 ){
           if( url.indexOf( jsonData.engines[ i ].match[ matchIndex ] ) > -1 ){
             // We have a match, increment our counter
             matchCount = matchCount + 1;
