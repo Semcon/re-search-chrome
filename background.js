@@ -151,6 +151,9 @@ chrome.runtime.onMessage.addListener(
         });
       }
     }
+    else if(request.runState === 'getState'){
+      sendResponse({runState: val});
+    }
     else{
       console.log('Message to event page was not handled: ', request);
     }
