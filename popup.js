@@ -1,6 +1,6 @@
 
 function clickHandler(e) {
-    chrome.extension.sendMessage({runState: "changeState"}, function(response) {
+    chrome.runtime.sendMessage({runState: "changeState"}, function(response) {
       console.log("Run state is: " , response.runState);
       var runState = response.runState;
       if(runState === 'enabled'){
@@ -18,7 +18,7 @@ function clickHandler(e) {
 
 document.addEventListener('DOMContentLoaded', function () {
   console.log('domContentLoaded');
-  chrome.extension.sendMessage({runState: "getState"}, function(response) {
+  chrome.runtime.sendMessage({runState: "getState"}, function(response) {
     console.log("Run state is: " , response.runState);
     var runState = response.runState;
     if(runState === 'enabled'){
