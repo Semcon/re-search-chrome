@@ -3,6 +3,7 @@ var runInit = true;
 var elements;
 
 function sendText( text ){
+  console.log('in sendText');
   if(runState === 'enabled' && typeof text !== 'undefined'){
     console.log( 'Sending', text );
     chrome.runtime.sendMessage( text, function(response) {
@@ -13,9 +14,9 @@ function sendText( text ){
   }
 }
 
-function getSearchTerm(selector){
-  console.log('Selector: ', selector);
-  elements = document.querySelectorAll(selector);
+function getSearchTerm(selectorInput, selectorButton, selectorAutoComplete){
+  console.log('Selector: ', selectorInput);
+  elements = document.querySelectorAll(selectorInput);
   if( elements.length === 0 ){
     setTimeout( init, 100 );
     return false;
@@ -23,25 +24,39 @@ function getSearchTerm(selector){
   var element = elements[ 0 ];
 
   if( element.value.length > 0 ){
-     sendText( element.value );
+    console.log('if value is > 0');
+    sendText( element.value );
   }
-  element.addEventListener( 'input', function( event ){
-     sendText( event.target.value );
+
+  window.addEventListener( 'keydown', function( event ){
+     if( event.keyCode === 13 ){
+       sendText(element.value);
+     }
+  });
+
+//  console.log(document.querySelectorAll(selectorAutoComplete)[0]);
+/*  document.querySelectorAll(selectorAutoComplete)[0].addEventListener('click', function (e) {
+      console.log('autocomplete was clicked');
+      sendText(element.value);
+  });
+*/
+  document.querySelectorAll(selectorButton)[0].addEventListener('click', function (e) {
+      console.log('search button was clicked');
+      sendText(element.value);
   });
 }
 
 function init(){
   console.log('In init');
   chrome.runtime.sendMessage({selector: "selector", url: window.location.href}, function(response) {
-    if(response.selector !== false){
-      getSearchTerm(response.selector);
+    if(response.selectorSearchField !== false){
+      getSearchTerm(response.selectorSearchField, response.selectorButton, response.selectorAutoComplete);
     }
     else{
       console.log('Selector not found');
     }
   });
 }
-
 
 //first time content script runs
 if( document.readyState === 'complete' ){
@@ -61,7 +76,6 @@ if( document.readyState === 'complete' ){
     }
   });
 }
-
 
 
 chrome.runtime.onMessage.addListener(

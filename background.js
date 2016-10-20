@@ -1,10 +1,5 @@
 
-
 var val ="";
-var jsonTermsGoogle;
-var jsonTermsBing;
-var googleURL;
-var bingURL;
 var currentTerms;
 var currentURL;
 var jsonData;
@@ -27,7 +22,7 @@ chrome.storage.sync.get("runState", function(data) {
 
 
 var xhr = new XMLHttpRequest();
-xhr.open("GET", "https://api.myjson.com/bins/4we1m", true);
+xhr.open("GET", "https://api.myjson.com/bins/37670", true);
 xhr.onreadystatechange = function() {
   if (xhr.readyState === 4 && xhr.status === 200) {
     jsonData = JSON.parse(xhr.responseText);
@@ -95,20 +90,25 @@ chrome.runtime.onMessage.addListener(
           // If we have the same number of matches as required matches we have a valid site
           if( matchCount === jsonData.engines[ i ].match.length ){
             console.log( 'Valid site' );
-            currentTerms = jsonData.engines[i].terms;
+            var engineTerms = jsonData.engines[i].terms;
+            var currentLanguage = jsonData.engines[i].language;
+            currentTerms = jsonData.terms[engineTerms][currentLanguage];
             currentURL = jsonData.engines[i].url;
-            sendResponse({selector: jsonData.engines[i].selector});
+            var selectorInput = jsonData.engines[i].selectors.input;
+            var selectorBtn = jsonData.engines[i].selectors.button;
+            var selectorAutoCmpl = jsonData.engines[i].selectors.autocomplete;
+            sendResponse({selectorSearchField: selectorInput, selectorButton: selectorBtn, selectorAutoComplete: selectorAutoCmpl});
             return true;
           }
         }
         console.log('If not valid site, Url:' , url);
-        sendResponse({selector: false});
+        sendResponse({selectorSearchField: false});
       }
     }
 
     //content script is sending terms
     else if(typeof currentTerms !== 'undefined' && currentTerms.hasOwnProperty(request)){
-      console.log('term is found');
+      console.log('term is found', request);
       sendResponse({status: 'term was found'});
       showWindows(request);
     }
