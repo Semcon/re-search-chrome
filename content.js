@@ -2,6 +2,9 @@ var runState;
 var runInit = true;
 var elements;
 
+
+
+
 function sendText( text ){
   console.log('in sendText');
   if(runState === 'enabled' && typeof text !== 'undefined'){
@@ -15,7 +18,7 @@ function sendText( text ){
 }
 
 function getSearchTerm(selectorInput, selectorButton, selectorAutoComplete){
-  console.log('Selector: ', selectorInput);
+  console.log('SelectorInput: ', selectorInput);
   elements = document.querySelectorAll(selectorInput);
   if( elements.length === 0 ){
     setTimeout( init, 100 );
@@ -28,22 +31,44 @@ function getSearchTerm(selectorInput, selectorButton, selectorAutoComplete){
     sendText( element.value );
   }
 
-  window.addEventListener( 'keydown', function( event ){
-     if( event.keyCode === 13 ){
-       sendText(element.value);
-     }
-  });
+  if(typeof selectorAutoComplete !== 'undefined'){
+    window.addEventListener( 'keydown', function( event ){
+       if( event.keyCode === 13 ){
+         console.log('enter was pressed');
+         sendText(element.value);
+       }
+    });
 
-//  console.log(document.querySelectorAll(selectorAutoComplete)[0]);
-/*  document.querySelectorAll(selectorAutoComplete)[0].addEventListener('click', function (e) {
-      console.log('autocomplete was clicked');
-      sendText(element.value);
-  });
-*/
-  document.querySelectorAll(selectorButton)[0].addEventListener('click', function (e) {
-      console.log('search button was clicked');
-      sendText(element.value);
-  });
+    window.addEventListener('click', function (event) {
+      console.log(event);
+        if( String(event.target.classList).indexOf( selectorAutoComplete.replace( '.', '' ) ) > -1 ){
+          console.log('autocomplete was clicked');
+          sendText(event.target.outerText);
+        }
+        else if(String(event.target.parentElement.classList).indexOf( selectorAutoComplete.replace( '.', '' ) ) > -1 ){
+          console.log('autocomplete was clicked');
+          sendText(event.target.parentElement.outerText);
+        }
+        else if(event.target.children.length > 0){
+          for(var i = 0; i < event.target.children.length; i++){
+            if(event.target.children[i].children.length > 0){
+              for(var j = 0; j < event.target.children[i].children.length; j++){
+                if(String(event.target.children[i].children[j].className).indexOf( selectorAutoComplete.replace( '.', '' ) ) > -1){
+                  console.log('autocomplete was clicked');
+                  sendText(event.target.children[i].children[j].outerText);
+                }
+              }
+            }
+          }
+        }
+    });
+  }
+  if(typeof selectorButton !== 'undefined'){
+    document.querySelectorAll(selectorButton)[0].addEventListener('click', function () {
+        console.log('search button was clicked');
+        sendText(element.value);
+    });
+  }
 }
 
 function init(){
@@ -61,6 +86,14 @@ function init(){
 //first time content script runs
 if( document.readyState === 'complete' ){
   console.log('document is complete');
+  console.log(document.querySelectorAll('.sfbgg')[0]);
+  document.querySelectorAll('.sfbgg')[0].setAttribute("style","height:75px");;
+
+  var btn = document.createElement('BUTTON');
+  var t = document.createTextNode('CLICK ME');
+  btn.appendChild(t);
+  document.querySelectorAll('.tsf-p')[0].appendChild(btn);
+
   console.log('Run init: ', runInit);
   chrome.runtime.sendMessage({runState: "?"}, function(response) {
     runState = response.runState;

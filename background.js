@@ -22,7 +22,7 @@ chrome.storage.sync.get("runState", function(data) {
 
 
 var xhr = new XMLHttpRequest();
-xhr.open("GET", "https://api.myjson.com/bins/37670", true);
+xhr.open("GET", "https://api.myjson.com/bins/4e30w", true);
 xhr.onreadystatechange = function() {
   if (xhr.readyState === 4 && xhr.status === 200) {
     jsonData = JSON.parse(xhr.responseText);
@@ -95,8 +95,15 @@ chrome.runtime.onMessage.addListener(
             currentTerms = jsonData.terms[engineTerms][currentLanguage];
             currentURL = jsonData.engines[i].url;
             var selectorInput = jsonData.engines[i].selectors.input;
-            var selectorBtn = jsonData.engines[i].selectors.button;
-            var selectorAutoCmpl = jsonData.engines[i].selectors.autocomplete;
+            var selectorBtn;
+            var selectorAutoCmpl;
+            if(jsonData.engines[i].selectors.hasOwnProperty('button')){
+                selectorBtn = jsonData.engines[i].selectors.button;
+            }
+            if(jsonData.engines[i].selectors.hasOwnProperty('autocomplete')){
+                selectorAutoCmpl = jsonData.engines[i].selectors.autocomplete;
+            }
+
             sendResponse({selectorSearchField: selectorInput, selectorButton: selectorBtn, selectorAutoComplete: selectorAutoCmpl});
             return true;
           }
