@@ -86,13 +86,6 @@ function init(){
 //first time content script runs
 if( document.readyState === 'complete' ){
   console.log('document is complete');
-  console.log(document.querySelectorAll('.sfbgg')[0]);
-  document.querySelectorAll('.sfbgg')[0].setAttribute("style","height:75px");;
-
-  var btn = document.createElement('BUTTON');
-  var t = document.createTextNode('CLICK ME');
-  btn.appendChild(t);
-  document.querySelectorAll('.tsf-p')[0].appendChild(btn);
 
   console.log('Run init: ', runInit);
   chrome.runtime.sendMessage({runState: "?"}, function(response) {
@@ -101,6 +94,18 @@ if( document.readyState === 'complete' ){
 
     if(runState === 'enabled' && runInit === true){
       console.log('runstate = enabled and runInit = true');
+      document.querySelectorAll('.sfbgg')[0].setAttribute("style","height:80px");
+      document.querySelectorAll('.sfbgg')[0].setAttribute("style","border-bottom:none");
+      document.getElementById('top_nav').setAttribute("style","margin-top:50px");
+      //document.getElementById('rcnt').setAttribute("style","margin-top:50px");
+
+      var btn = document.createElement('BUTTON');
+      btn.setAttribute("style","margin-top:5px");
+      btn.setAttribute("style","height:28px");
+      var t = document.createTextNode('CLICK ME');
+      btn.appendChild(t);
+      document.querySelectorAll('.tsf-p')[0].appendChild(btn);
+
       init();
       runInit = false;
     }
