@@ -2,6 +2,7 @@
     var runState;
     var runInit = true;
     var elements;
+    var terms;
 
     function sendText( text ){
         console.log('in sendText');
@@ -68,6 +69,31 @@
         }
     }
 
+    function setUI(){
+    //Adapt Google's UI
+      document.querySelectorAll('.sfbgg')[0].setAttribute("style","height:80px");
+    //  document.querySelectorAll('.sfbgg')[0].setAttribute("style","border-bottom:none");
+      document.getElementById('top_nav').setAttribute("style","margin-top:50px");
+
+      //Create array of options to be added
+    //  var array = ["Volvo","Saab","Mercedes","Audi"];
+
+      //Create and append select list
+      var selectList = document.createElement("select");
+      selectList.setAttribute("style","height:28px; width: 150px; margin-top: 5px");
+      selectList.id = "termList";
+      document.querySelectorAll('.tsf-p')[0].appendChild(selectList);
+
+      //Create and append the options
+      for (var i = 0; i < Object.keys(terms).length; i++) {
+        console.log('in loop');
+          var option = document.createElement("option");
+          option.value = Object.keys(terms)[i];
+          option.text = Object.keys(terms)[i];
+          selectList.appendChild(option);
+      }
+    }
+
     function init(){
         console.log('In init');
         chrome.runtime.sendMessage({
@@ -76,6 +102,8 @@
         }, function(response) {
             if( response.selectorSearchField !== false ){
                 getSearchTerm(response.selectorSearchField, response.selectorButton, response.selectorAutoComplete);
+                terms = response.terms;
+                setUI();
             } else {
                 console.log('Selector not found');
             }
@@ -84,7 +112,7 @@
 
     function runWhenReady(){
         if( document.readyState !== 'complete' ){
-            setTimeout( checkIfReady, 100 );
+            setTimeout( runWhenReady, 100 );
             return false;
         }
 
@@ -99,18 +127,6 @@
 
             if(runState === 'enabled' && runInit === true){
                 console.log('runstate = enabled and runInit = true');
-                document.querySelectorAll('.sfbgg')[0].setAttribute("style","height:80px");
-                document.querySelectorAll('.sfbgg')[0].setAttribute("style","border-bottom:none");
-                document.getElementById('top_nav').setAttribute("style","margin-top:50px");
-                //document.getElementById('rcnt').setAttribute("style","margin-top:50px");
-
-                var btn = document.createElement('BUTTON');
-                btn.setAttribute("style","margin-top:5px");
-                btn.setAttribute("style","height:28px");
-                var t = document.createTextNode('CLICK ME');
-                btn.appendChild(t);
-                document.querySelectorAll('.tsf-p')[0].appendChild(btn);
-
                 init();
                 runInit = false;
             } else if( runState === 'disabled' ){

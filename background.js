@@ -120,7 +120,8 @@ function getSelector( request, sender, sendResponse ){
                 sendResponse({
                     selectorSearchField: selectorInput,
                     selectorButton: selectorBtn,
-                    selectorAutoComplete: selectorAutoCmpl
+                    selectorAutoComplete: selectorAutoCmpl,
+                    terms: currentTerms
                 });
 
                 return true;
