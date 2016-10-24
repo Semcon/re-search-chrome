@@ -1,4 +1,4 @@
-var enabled = '';
+var currentState = '';
 var currentTerms;
 var currentURL;
 var jsonData;
@@ -9,21 +9,20 @@ var DATA_URL = 'https://api.myjson.com/bins/4e30w';
 //First time running script to check what value runState is in chrome storage.
 //If runState is undefined it is gets set to enabled otherwise it gets the value.
 chrome.storage.sync.get( 'runState', function(data) {
-    enabled = data.runState;
+    currentState = data.runState;
 
     if( doLog ){
-        console.log( 'val: ', enabled );
+        console.log( 'val: ', currentState );
     }
 
     if( typeof enabled === 'undefined' ){
+        currentState = 'enabled';
         chrome.storage.sync.set( {
-            runState: 'enabled'
+            runState: currentState
         }, function () {
             if( doLog ){
-                console.log( 'Saved', 'runState', 'enabled' );
+                console.log( 'Saved', 'runState', currentState );
             }
-
-            enabled = 'enabled';
         });
     }
 
@@ -35,7 +34,7 @@ var xhr = new XMLHttpRequest();
 xhr.open( 'GET', DATA_URL, true );
 xhr.onreadystatechange = function() {
     if ( xhr.readyState === 4 && xhr.status === 200 ) {
-        jsonData = JSON.parse(xhr.responseText);
+        jsonData = JSON.parse( xhr.responseText );
     }
 }
 xhr.send();
@@ -101,6 +100,7 @@ function getSelector( request, sender, sendResponse ){
                 if( doLog ){
                     console.log( 'Valid site' );
                 }
+
                 var engineTerms = jsonData.engines[i].terms;
                 var currentLanguage = jsonData.engines[i].language;
                 currentTerms = jsonData.terms[engineTerms][currentLanguage];
@@ -158,64 +158,38 @@ chrome.runtime.onMessage.addListener(
                 status: 'term was found'
             });
 
-            showWindows(request);
+            showWindows( request );
         } else if( request.runState === 'changeState' ){
             //From popup
             if( doLog ){
-                console.log( 'ChangeState from popup / current value is: ', val );
+                console.log( 'ChangeState from popup / current value is: ', currentState );
             }
 
-            if( enabled === 'enabled'){
-                chrome.storage.sync.set({
-                    runState: 'disabled'
-                }, function () {
-                    if( doLog ){
-                        console.log('Saved', 'runState', 'disabled');
-                    }
+            if( currentState === 'enabled'){
+                currentState = 'disabled';
+            } else {
+                currentState = 'enabled';
+            }
 
-                    enabled = 'disabled';
+            chrome.storage.sync.set(
+                {
+                    runState: currentState
+                },
+                function () {
+                    if( doLog ){
+                        console.log( 'Saved', 'runState', currentState );
+                    }
 
                     chrome.tabs.query({
                         active: true,
                         currentWindow: true
-                    }, function(tabs) {
+                    }, function( tabs ) {
                         chrome.tabs.sendMessage( tabs[0].id, {
-                            runState: 'disabled'
-                        }, function(response) {
+                            runState: currentState
+                        }, function( response ) {
                             if( response ){
                                 if( doLog ){
-                                    console.log(response.message);
-                                }
-                            } else {
-                                if( doLog ){
-                                    console.log('Content script not injected');
-                                }
-                            }
-                        });
-                    });
-                    sendResponse({
-                        runState: enabled
-                    });
-                });
-            } else if( enabled === 'disabled'){
-                chrome.storage.sync.set({
-                    runState: 'enabled'
-                }, function () {
-                    if( doLog ){
-                        console.log('Saved', 'runState', 'enabled');
-                    }
-
-                    enabled = 'enabled';
-                    chrome.tabs.query({
-                        active: true,
-                        currentWindow: true
-                    }, function(tabs) {
-                        chrome.tabs.sendMessage( tabs[0].id, {
-                            runState: 'enabled'
-                        }, function(response) {
-                            if( response ){
-                                if( doLog ){
-                                    console.log(response.message);
+                                    console.log( response.message );
                                 }
                             } else {
                                 if( doLog ){
@@ -226,17 +200,17 @@ chrome.runtime.onMessage.addListener(
                     });
 
                     sendResponse({
-                        runState: enabled
+                        runState: currentState
                     });
-                });
-            }
+                }
+            );
         } else if( request.runState === 'getState' ){
             sendResponse({
-                runState: enabled
+                runState: currentState
             });
         } else {
             if( doLog ){
-                console.log('Message to event page was not handled: ', request);
+                console.log( 'Message to event page was not handled: ', request );
             }
         }
 
