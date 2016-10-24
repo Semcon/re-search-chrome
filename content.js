@@ -2,7 +2,8 @@
     var runState;
     var runInit = true;
     var elements;
-    var terms;
+    var englishTerms;
+    var runSetUI = true;
 
     function sendText( text ){
         console.log('in sendText');
@@ -30,14 +31,15 @@
             sendText( element.value );
         }
 
-        if(typeof selectorAutoComplete !== 'undefined'){
-            window.addEventListener( 'keydown', function( event ){
-                if( event.keyCode === 13 ){
-                    console.log('enter was pressed');
-                    sendText(element.value);
-                }
-            });
 
+          window.addEventListener( 'keydown', function( event ){
+              if( event.keyCode === 13 ){
+                  console.log('enter was pressed');
+                  sendText(element.value);
+              }
+          });
+
+          if(typeof selectorAutoComplete !== 'undefined'){
             window.addEventListener('click', function (event) {
                 console.log(event);
                 if( String(event.target.classList).indexOf( selectorAutoComplete.replace( '.', '' ) ) > -1 ){
@@ -59,7 +61,7 @@
                     }
                 }
             });
-        }
+          }
 
         if(typeof selectorButton !== 'undefined'){
             document.querySelectorAll(selectorButton)[0].addEventListener('click', function () {
@@ -71,25 +73,20 @@
 
     function setUI(){
     //Adapt Google's UI
-      document.querySelectorAll('.sfbgg')[0].setAttribute("style","height:80px");
-    //  document.querySelectorAll('.sfbgg')[0].setAttribute("style","border-bottom:none");
-      document.getElementById('top_nav').setAttribute("style","margin-top:50px");
-
-      //Create array of options to be added
-    //  var array = ["Volvo","Saab","Mercedes","Audi"];
+      document.querySelectorAll('.sfbgg')[0].setAttribute("style","height:90px");
+      document.getElementById('top_nav').setAttribute("style","margin-top: 31px;");
 
       //Create and append select list
       var selectList = document.createElement("select");
-      selectList.setAttribute("style","height:28px; width: 150px; margin-top: 5px");
+      selectList.setAttribute("style","height:25px; width: 150px; margin-top: 5px");
       selectList.id = "termList";
       document.querySelectorAll('.tsf-p')[0].appendChild(selectList);
 
       //Create and append the options
-      for (var i = 0; i < Object.keys(terms).length; i++) {
-        console.log('in loop');
+      for (var i = 0; i < Object.keys(englishTerms).length; i++) {
           var option = document.createElement("option");
-          option.value = Object.keys(terms)[i];
-          option.text = Object.keys(terms)[i];
+          option.value = Object.keys(englishTerms)[i];
+          option.text = Object.keys(englishTerms)[i];
           selectList.appendChild(option);
       }
     }
@@ -102,8 +99,11 @@
         }, function(response) {
             if( response.selectorSearchField !== false ){
                 getSearchTerm(response.selectorSearchField, response.selectorButton, response.selectorAutoComplete);
-                terms = response.terms;
-                setUI();
+                englishTerms = response.terms;
+                if(runSetUI !== false){
+                  setUI();
+                  runSetUI = false;
+                }
             } else {
                 console.log('Selector not found');
             }

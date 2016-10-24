@@ -102,6 +102,7 @@ function getSelector( request, sender, sendResponse ){
                 }
 
                 var engineTerms = jsonData.engines[i].terms;
+                var englishTerms = jsonData.terms[engineTerms].eng;
                 var currentLanguage = jsonData.engines[i].language;
                 currentTerms = jsonData.terms[engineTerms][currentLanguage];
                 currentURL = jsonData.engines[i].url;
@@ -121,7 +122,7 @@ function getSelector( request, sender, sendResponse ){
                     selectorSearchField: selectorInput,
                     selectorButton: selectorBtn,
                     selectorAutoComplete: selectorAutoCmpl,
-                    terms: currentTerms
+                    terms: englishTerms
                 });
 
                 return true;
