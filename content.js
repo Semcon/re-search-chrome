@@ -2,7 +2,6 @@
     var runState;
     var runInit = true;
     var elements;
-    var englishTerms;
     var runSetUI = true;
 
     function sendText( text ){
@@ -41,7 +40,6 @@
 
           if(typeof selectorAutoComplete !== 'undefined'){
             window.addEventListener('click', function (event) {
-                console.log(event);
                 if( String(event.target.classList).indexOf( selectorAutoComplete.replace( '.', '' ) ) > -1 ){
                     console.log('autocomplete was clicked');
                     sendText(event.target.outerText);
@@ -64,30 +62,46 @@
           }
 
         if(typeof selectorButton !== 'undefined'){
-            document.querySelectorAll(selectorButton)[0].addEventListener('click', function () {
-                console.log('search button was clicked');
-                sendText(element.value);
-            });
+          document.querySelectorAll(selectorButton)[0].addEventListener('click', function () {
+              console.log('search button was clicked');
+              sendText(element.value);
+          });
+        }
+
+        if(typeof document.getElementById('termList') !== 'undefined'){
+          document.getElementById('termList').addEventListener('change', function(event){
+            sendText(document.getElementById('termList').value);
+            document.querySelectorAll(selectorInput)[0].value = document.getElementById('termList').value;
+            document.getElementById("termList").selectedIndex = 0;
+          });
+
         }
     }
 
-    function setUI(){
-    //Adapt Google's UI
-      document.querySelectorAll('.sfbgg')[0].setAttribute("style","height:90px");
-      document.getElementById('top_nav').setAttribute("style","margin-top: 31px;");
+    function setUI(selectorSearchField, englishTerms){
+      if(selectorSearchField === '.gsfi'){
+        //Adapt Google's UI
+        document.querySelectorAll('.sfbgg')[0].setAttribute("style","height: 90px");
+        document.getElementById('top_nav').setAttribute("style","margin-top: 31px;");
 
-      //Create and append select list
-      var selectList = document.createElement("select");
-      selectList.setAttribute("style","height:25px; width: 150px; margin-top: 5px");
-      selectList.id = "termList";
-      document.querySelectorAll('.tsf-p')[0].appendChild(selectList);
+        //Create and append select list
+        var selectList = document.createElement("SELECT");
+        selectList.setAttribute("style","height: 25px; width: 160px; margin-top: 5px");
+        selectList.id = "termList";
+        document.querySelectorAll('.tsf-p')[0].appendChild(selectList);
+        var defaultOption = document.createElement("option");
+        defaultOption.value = 'Other Re-search terms';
+        defaultOption.text = 'Other Re-search terms';
+        selectList.add(defaultOption);
+
+      }
 
       //Create and append the options
       for (var i = 0; i < Object.keys(englishTerms).length; i++) {
           var option = document.createElement("option");
           option.value = Object.keys(englishTerms)[i];
           option.text = Object.keys(englishTerms)[i];
-          selectList.appendChild(option);
+          selectList.add(option);
       }
     }
 
@@ -99,9 +113,8 @@
         }, function(response) {
             if( response.selectorSearchField !== false ){
                 getSearchTerm(response.selectorSearchField, response.selectorButton, response.selectorAutoComplete);
-                englishTerms = response.terms;
                 if(runSetUI !== false){
-                  setUI();
+                  setUI(response.selectorSearchField, response.terms);
                   runSetUI = false;
                 }
             } else {
