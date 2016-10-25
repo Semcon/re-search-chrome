@@ -21,15 +21,16 @@
 
     function addListeners( selectorAutoComplete, selectorButton ){
         var searchButtons;
+        var inputSelectors;
 
         //Gets value from search field if enter is pressed
-        window.addEventListener( 'keydown', function( event ){
+    /*    window.addEventListener( 'keydown', function( event ){
             if( event.keyCode === 13 ){
                 console.log('enter was pressed');
                 getSearchTerm();
             }
         });
-
+    */
         //Gets value autocomplete and checks parent and child elements
         if(typeof selectorAutoComplete !== 'undefined'){
             window.addEventListener('click', function (event) {
@@ -59,6 +60,7 @@
             searchButtons = document.querySelectorAll(selectorButton);
             if( searchButtons.length > 0 ){
                 searchButtons[0].addEventListener('click', function () {
+                    console.log( 'got click' );
                     getSearchTerm();
                 });
             }
@@ -68,7 +70,10 @@
         if(document.getElementById('termList') !== null){
             document.getElementById('termList').addEventListener('change', function(event){
                 sendText(document.getElementById('termList').value);
-                document.querySelectorAll(selectorInput)[0].value = document.getElementById('termList').value;
+                inputSelectors = document.querySelectorAll(inputSelector);
+                if( inputSelectors.length > 0 ){
+                    document.querySelectorAll(inputSelector)[0].value = document.getElementById('termList').value;
+                }
                 document.getElementById("termList").selectedIndex = 0;
             });
         }
@@ -93,30 +98,49 @@
         }
     }
 
-    function setUI(selectorSearchField, englishTerms){
-        if(selectorSearchField === '.gsfi'){
-            //Adapt Google's UI
+    function getSelectList( terms ){
+        //Create and append select list
+        var selectList = document.createElement("SELECT");
+        selectList.setAttribute("style","height: 25px; width: 162px; margin-top: 5px");
+        selectList.id = "termList";
+
+        var defaultOption = document.createElement("option");
+        defaultOption.value = 'Other Re-search terms';
+        defaultOption.text = 'Other Re-search terms';
+        selectList.add(defaultOption);
+
+        //Create and append the options
+        for (var i = 0; i < Object.keys(terms).length; i++) {
+            var option = document.createElement("option");
+            option.value = Object.keys(terms)[i];
+            option.text = Object.keys(terms)[i];
+            selectList.add(option);
+        }
+
+        return selectList;
+    }
+
+    function setUI(englishTerms){
+        var selectList = getSelectList( englishTerms );
+
+        //Adapt Google UI
+        if(inputSelector === '.gsfi'){
+            console.log('in googles UI');
             document.querySelectorAll('.sfbgg')[0].setAttribute("style","height: 90px");
             document.getElementById('top_nav').setAttribute("style","margin-top: 31px;");
 
-            //Create and append select list
-            var selectList = document.createElement("SELECT");
-            selectList.setAttribute("style","height: 25px; width: 160px; margin-top: 5px");
-            selectList.id = "termList";
             document.querySelectorAll('.tsf-p')[0].appendChild(selectList);
-            var defaultOption = document.createElement("option");
-            defaultOption.value = 'Other Re-search terms';
-            defaultOption.text = 'Other Re-search terms';
-            selectList.add(defaultOption);
+        }
 
-
-            //Create and append the options
-            for (var i = 0; i < Object.keys(englishTerms).length; i++) {
-                var option = document.createElement("option");
-                option.value = Object.keys(englishTerms)[i];
-                option.text = Object.keys(englishTerms)[i];
-                selectList.add(option);
-            }
+        //Adapt Bing UI
+        else if(inputSelector === '.b_searchbox'){
+            console.log('in Bings UI');
+            document.getElementById('ftr_pane').setAttribute("style","margin-top: 31px;");
+            //Create and append select list
+            var div = document.createElement("DIV");
+            div.setAttribute("style", "margin-top: 5px; margin-left: 100px;");
+            div.appendChild(selectList);
+            document.getElementById('b_header').insertBefore(div, document.querySelectorAll('.b_scopebar')[0]);
         }
     }
 
@@ -127,13 +151,12 @@
             url: window.location.href
         }, function(response) {
             if( response.selectorSearchField !== false ){
-                if(runSetUI !== false){
-                    setUI(response.selectorSearchField, response.englishTerms);
-                    runSetUI = false;
-                }
-
                 inputSelector = response.selectorSearchField;
 
+                if(runSetUI !== false){
+                    setUI(response.englishTerms);
+                    runSetUI = false;
+                }
                 addListeners( response.selectorAutoComplete, response.selectorButton );
                 getSearchTerm();
             } else {

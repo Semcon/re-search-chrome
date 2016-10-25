@@ -150,7 +150,9 @@ chrome.runtime.onMessage.addListener(
         } else if( request.action === 'getSelector' ){
             getSelector( request, sender, sendResponse );
         } else if(request.action === 'searchForTerm'){
+            console.log('received term: ', request.term);
             if(typeof currentTerms !== 'undefined'){
+                console.log('currentTerms not undefined');
                 for(var i = 0; i < currentTerms.length; i++ ){
                     if(currentTerms[i].hasOwnProperty( request.term )){
                         if( doLog ){
