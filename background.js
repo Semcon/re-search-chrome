@@ -40,9 +40,10 @@ xhr.onreadystatechange = function() {
 xhr.send();
 
 
-function showWindows(request){
+function showWindows(request , index){
+    console.log(currentTerms[index][request.term]);
     if( typeof currentURL !== 'undefined' && typeof currentTerms !== 'undefined' ){
-        var link = currentURL + currentTerms[request];
+        var link = currentURL + currentTerms[index][request.term];
 
         if( doLog ){
             console.log( 'Link: ' , link );
@@ -79,6 +80,8 @@ function showWindows(request){
 function getSelector( request, sender, sendResponse ){
     //content script is asking for selector
     var url = request.url;
+    var currentEngine;
+
     // Loop over all engines
     if( typeof jsonData !== 'undefined' && typeof url !== 'undefined' ){
         for( var i = 0; i < jsonData.engines.length; i = i + 1 ){
@@ -101,28 +104,24 @@ function getSelector( request, sender, sendResponse ){
                     console.log( 'Valid site' );
                 }
 
-                var engineTerms = jsonData.engines[i].terms;
-                var englishTerms = jsonData.terms[engineTerms].eng;
-                var currentLanguage = jsonData.engines[i].language;
-                currentTerms = jsonData.terms[engineTerms][currentLanguage];
-                currentURL = jsonData.engines[i].url;
-                var selectorInput = jsonData.engines[i].selectors.input;
-                var selectorBtn;
-                var selectorAutoCmpl;
+                currentEngine = jsonData.engines[ i ];
 
-                if( jsonData.engines[i].selectors.hasOwnProperty('button') ){
-                    selectorBtn = jsonData.engines[i].selectors.button;
+                //  var engine = jsonData.engines[i].terms;
+                //  var englishTerms = jsonData.terms[engine].eng;
+                //  var currentLanguage = jsonData.engines[i].language;
+                //  var selectorInput = jsonData.engines[i].selectors.input;
+                currentTerms = [];
+                for(var key in jsonData.terms[currentEngine.terms]){
+                    currentTerms.push(jsonData.terms[currentEngine.terms][key]);
                 }
 
-                if( jsonData.engines[i].selectors.hasOwnProperty('autocomplete') ){
-                    selectorAutoCmpl = jsonData.engines[i].selectors.autocomplete;
-                }
+                currentURL = currentEngine.url;
 
                 sendResponse({
-                    selectorSearchField: selectorInput,
-                    selectorButton: selectorBtn,
-                    selectorAutoComplete: selectorAutoCmpl,
-                    terms: englishTerms
+                    selectorSearchField: currentEngine.selectors.input,
+                    selectorButton: currentEngine.selectors.button,
+                    selectorAutoComplete: currentEngine.selectors.autocomplete,
+                    englishTerms: jsonData.terms[currentEngine.terms].eng
                 });
 
                 return true;
@@ -141,30 +140,37 @@ function getSelector( request, sender, sendResponse ){
 
 chrome.runtime.onMessage.addListener(
     function( request, sender, sendResponse ) {
-        //content script asks if extension is on/off
-        if( request.runState === '?' ){
+        //From content script
+        if( request.action === 'getRunState' ){
             chrome.storage.sync.get( 'runState', function(data) {
                 sendResponse({
                     runState: data.runState
                 });
             });
-        } else if( request.selector === 'selector' ){
+        } else if( request.action === 'getSelector' ){
             getSelector( request, sender, sendResponse );
-        } else if( typeof currentTerms !== 'undefined' && currentTerms.hasOwnProperty( request )){
-            //content script is sending terms
-            if( doLog ){
-                console.log('term is found', request);
+        } else if(request.action === 'searchForTerm'){
+            if(typeof currentTerms !== 'undefined'){
+                for(var i = 0; i < currentTerms.length; i++ ){
+                    if(currentTerms[i].hasOwnProperty( request.term )){
+                        if( doLog ){
+                            console.log('term is found', request);
+                        }
+
+                        sendResponse({
+                            status: 'term was found'
+                        });
+
+                        showWindows( request , i );
+                    }
+                }
             }
 
-            sendResponse({
-                status: 'term was found'
-            });
+        //From popup
+    } else if( request.action === 'changeRunState' ){
 
-            showWindows( request );
-        } else if( request.runState === 'changeState' ){
-            //From popup
             if( doLog ){
-                console.log( 'ChangeState from popup / current value is: ', currentState );
+                console.log( 'ChangeRunState from popup / current value is: ', currentState );
             }
 
             if( currentState === 'enabled'){
@@ -173,10 +179,7 @@ chrome.runtime.onMessage.addListener(
                 currentState = 'enabled';
             }
 
-            chrome.storage.sync.set(
-                {
-                    runState: currentState
-                },
+            chrome.storage.sync.set({ runState: currentState },
                 function () {
                     if( doLog ){
                         console.log( 'Saved', 'runState', currentState );
@@ -187,6 +190,7 @@ chrome.runtime.onMessage.addListener(
                         currentWindow: true
                     }, function( tabs ) {
                         chrome.tabs.sendMessage( tabs[0].id, {
+                            action: 'changeRunState',
                             runState: currentState
                         }, function( response ) {
                             if( response ){
@@ -206,7 +210,7 @@ chrome.runtime.onMessage.addListener(
                     });
                 }
             );
-        } else if( request.runState === 'getState' ){
+        } else if( request.action === 'getRunState' ){
             sendResponse({
                 runState: currentState
             });

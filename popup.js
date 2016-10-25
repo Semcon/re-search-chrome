@@ -1,5 +1,5 @@
 function clickHandler( event ) {
-    chrome.runtime.sendMessage({runState: "changeState"}, function(response) {
+    chrome.runtime.sendMessage({action: "changeRunState"}, function(response) {
         console.log("Run state is: " , response.runState);
         var runState = response.runState;
 
@@ -18,7 +18,7 @@ function clickHandler( event ) {
 document.addEventListener('DOMContentLoaded', function () {
     console.log('domContentLoaded');
     chrome.runtime.sendMessage({
-        runState: "getState"
+        action: "getRunState"
     }, function(response) {
         console.log("Run state is: " , response.runState);
         var runState = response.runState;
