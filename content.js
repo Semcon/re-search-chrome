@@ -5,6 +5,8 @@
     var runSetUI = true;
     var inputSelector;
 
+
+
     function sendText( text ){
         if( runState === 'enabled' && typeof text !== 'undefined' ){
             console.log( 'Sending', text );
@@ -69,12 +71,19 @@
         //Gets value from drop-down list
         if(document.getElementById('termList') !== null){
             document.getElementById('termList').addEventListener('change', function(event){
-                sendText(document.getElementById('termList').value);
+                var term = document.getElementById('termList').value;
+            //    sendText(document.getElementById('termList').value);
                 inputSelectors = document.querySelectorAll(inputSelector);
+
                 if( inputSelectors.length > 0 ){
                     document.querySelectorAll(inputSelector)[0].value = document.getElementById('termList').value;
                 }
                 document.getElementById("termList").selectedIndex = 0;
+                chrome.runtime.sendMessage({
+                    action: "updateTabURL",
+                    term: term,
+                    parseInputField: false
+                });
             });
         }
     }
@@ -101,7 +110,7 @@
     function getSelectList( terms ){
         //Create and append select list
         var selectList = document.createElement("SELECT");
-        selectList.setAttribute("style","height: 25px; width: 162px; margin-top: 5px");
+        selectList.setAttribute("style","height: 25px; width: 164px; margin-top: 5px");
         selectList.id = "termList";
 
         var defaultOption = document.createElement("option");
@@ -128,7 +137,6 @@
             console.log('in googles UI');
             document.querySelectorAll('.sfbgg')[0].setAttribute("style","height: 90px");
             document.getElementById('top_nav').setAttribute("style","margin-top: 31px;");
-
             document.querySelectorAll('.tsf-p')[0].appendChild(selectList);
         }
 

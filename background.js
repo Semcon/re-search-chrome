@@ -55,19 +55,19 @@ function showWindows(request , index){
             }
 
             chrome.windows.create( {
-                height: window.height,
-                left: window.width / 2 + 8,
+                height: parseInt(window.height),
+                left: parseInt(window.width / 2 + 8),
                 state: 'normal',
-                top: 0,
+                top: parseInt(0),
                 type: 'normal',
                 url: link,
-                width: window.width / 2 + 8
+                width: parseInt(window.width / 2 + 8)
             });
 
             chrome.windows.update( window.id, {
-                height: window.height,
+                height: parseInt(window.height),
                 state: 'normal',
-                width: window.width / 2 + 8
+                width: parseInt(window.width / 2 + 8)
             });
         });
     } else {
@@ -105,11 +105,6 @@ function getSelector( request, sender, sendResponse ){
                 }
 
                 currentEngine = jsonData.engines[ i ];
-
-                //  var engine = jsonData.engines[i].terms;
-                //  var englishTerms = jsonData.terms[engine].eng;
-                //  var currentLanguage = jsonData.engines[i].language;
-                //  var selectorInput = jsonData.engines[i].selectors.input;
                 currentTerms = [];
                 for(var key in jsonData.terms[currentEngine.terms]){
                     currentTerms.push(jsonData.terms[currentEngine.terms][key]);
@@ -152,7 +147,7 @@ chrome.runtime.onMessage.addListener(
         } else if(request.action === 'searchForTerm'){
             console.log('received term: ', request.term);
             if(typeof currentTerms !== 'undefined'){
-                console.log('currentTerms not undefined');
+                console.log('currentTerms is defined');
                 for(var i = 0; i < currentTerms.length; i++ ){
                     if(currentTerms[i].hasOwnProperty( request.term )){
                         if( doLog ){
@@ -167,9 +162,25 @@ chrome.runtime.onMessage.addListener(
                     }
                 }
             }
+        } else if(request.action === 'updateTabURL'){
+            chrome.tabs.query({
+                active: true,
+                currentWindow: true
+            }, function(tabs) {
+                var tabURL = tabs[0].url;
+                console.log(tabURL);
+                parseInputField = request.parseInputField;
+                var newURL = currentURL + request.term;
+                console.log('new url: ', newURL);
+                chrome.tabs.update(tabs[0].id, {url: newURL});
+                if( doLog ){
+                    console.log('tabURL: ', tabs[0].url );
+                }
+            });
+        }
 
         //From popup
-    } else if( request.action === 'changeRunState' ){
+        else if( request.action === 'changeRunState' ){
 
             if( doLog ){
                 console.log( 'ChangeRunState from popup / current value is: ', currentState );
