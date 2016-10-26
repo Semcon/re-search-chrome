@@ -159,6 +159,7 @@ chrome.runtime.onMessage.addListener(
                         });
 
                         showWindows( request , i );
+                        break;
                     }
                 }
             }
