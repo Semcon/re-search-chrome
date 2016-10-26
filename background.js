@@ -145,7 +145,9 @@ chrome.runtime.onMessage.addListener(
         } else if( request.action === 'getSelector' ){
             getSelector( request, sender, sendResponse );
         } else if(request.action === 'searchForTerm'){
+            var termStatus = 'term not found';
             console.log('received term: ', request.term);
+            console.log('currentTerms: ', currentTerms);
             if(typeof currentTerms !== 'undefined'){
                 console.log('currentTerms is defined');
                 for(var i = 0; i < currentTerms.length; i++ ){
@@ -153,15 +155,15 @@ chrome.runtime.onMessage.addListener(
                         if( doLog ){
                             console.log('term is found', request);
                         }
-
-                        sendResponse({
-                            status: 'term was found'
-                        });
+                        termStatus = 'term was found';
 
                         showWindows( request , i );
                         break;
                     }
                 }
+                sendResponse({
+                    status: termStatus
+                });
             }
         } else if(request.action === 'updateTabURL'){
             chrome.tabs.query({
