@@ -6,7 +6,7 @@
     var inputSelector;
     var titleTerm = false;
     var englishTerms;
-    var testStatus = true;
+
 
     function sendText( text ){
         if( runState === 'enabled' && typeof text !== 'undefined' ){
@@ -46,6 +46,7 @@
             window.addEventListener('click', function (event) {
                 if ( String( event.target.classList ).indexOf( selectorAutoComplete.replace( '.', '' ) ) > -1 ) {
                     console.log('autocomplete was clicked');
+                    console.log('autocomplete input: ' , event.target.outerText);
                     sendText(event.target.outerText);
                 } else if(String(event.target.parentElement.classList).indexOf( selectorAutoComplete.replace( '.', '' ) ) > -1 ){
                     console.log('autocomplete was clicked');
