@@ -3,7 +3,7 @@ var currentTerms;
 var currentURL;
 var jsonData;
 var doLog = false;
-var alternateWindowId = false;
+var alternateWindow = false;
 var windowBeforeUpdateState = false;
 
 var DATA_URL = 'https://api.myjson.com/bins/4e30w';
@@ -34,7 +34,7 @@ chrome.storage.sync.get( 'runState', function(data) {
 chrome.windows.onRemoved.addListener( function( windowId ){
     console.log( 'Window removed' );
 
-    if( windowId === alternateWindowId ){
+    if( windowId === alternateWindow.id ){
         chrome.windows.update( windowBeforeUpdateState.id, {
             left: windowBeforeUpdateState.left,
             top: windowBeforeUpdateState.top,
@@ -42,7 +42,8 @@ chrome.windows.onRemoved.addListener( function( windowId ){
             height: windowBeforeUpdateState.height,
             focused: windowBeforeUpdateState.focused
         } );
-        alternateWindowId = false;
+
+        alternateWindow = false;
     }
 } );
 
@@ -56,8 +57,6 @@ xhr.onreadystatechange = function() {
 xhr.send();
 
 function showWindows(request , index){
-    console.log(currentTerms[index][request.term]);
-
     if( typeof currentURL !== 'undefined' && typeof currentTerms !== 'undefined' ){
         var link = currentURL + currentTerms[index][request.term];
 
@@ -72,17 +71,25 @@ function showWindows(request , index){
 
             windowBeforeUpdateState = window;
 
-            chrome.windows.create( {
-                height: parseInt(window.height),
-                left: parseInt(window.width / 2 + 8),
-                state: 'normal',
-                top: parseInt(0),
-                type: 'normal',
-                url: link,
-                width: parseInt(window.width / 2 + 8)
-            }, function( createdWindowData ) {
-                alternateWindowId = createdWindowData.id;
-            });
+            if( alternateWindow === false ){
+                chrome.windows.create( {
+                    height: parseInt(window.height),
+                    left: parseInt(window.width / 2 + 8),
+                    state: 'normal',
+                    top: parseInt(0),
+                    type: 'normal',
+                    url: link,
+                    width: parseInt(window.width / 2 + 8)
+                }, function( createdWindowData ) {
+                    alternateWindow = createdWindowData;
+                    console.log( alternateWindow );
+                });
+            } else {
+                console.log( 'Should update alternate window' );
+                chrome.tabs.update( alternateWindow.tabs[ 0 ].id, {
+                    url: link
+                });
+            }
 
             chrome.windows.update( window.id, {
                 height: parseInt(window.height),
