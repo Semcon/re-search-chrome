@@ -32,7 +32,9 @@ chrome.storage.sync.get( 'runState', function(data) {
 });
 
 chrome.windows.onRemoved.addListener( function( windowId ){
-    console.log( 'Window removed' );
+    if( doLog ){
+        console.log( 'Window removed', windowId );
+    }
 
     if( windowId === alternateWindow.id ){
         chrome.windows.update( windowBeforeUpdateState.id, {
@@ -74,20 +76,19 @@ function showWindows(request , index){
                 console.log( window );
             }
 
-            windowBeforeUpdateState = window;
-
             if( alternateWindow === false ){
+                windowBeforeUpdateState = window;
+
                 chrome.windows.create( {
-                    height: parseInt( window.height ),
+                    height: parseInt( window.height, 10 ),
                     left: parseInt( window.left + ( window.width / 2 ), 10 ),
                     state: 'normal',
                     top: parseInt( window.top, 10 ) ,
                     type: 'normal',
                     url: link,
-                    width: parseInt( window.width / 2 )
+                    width: parseInt( window.width / 2, 10 )
                 }, function( createdWindowData ) {
                     alternateWindow = createdWindowData;
-                    console.log( alternateWindow );
                 });
 
                 chrome.windows.update( window.id, {
@@ -95,7 +96,10 @@ function showWindows(request , index){
                     width: parseInt( window.width / 2, 10 )
                 });
             } else {
-                console.log( 'Should update alternate window' );
+                if( doLog ){
+                    console.log( 'Should update alternate window' );
+                }
+
                 chrome.tabs.update( alternateWindow.tabs[ 0 ].id, {
                     url: link
                 });
