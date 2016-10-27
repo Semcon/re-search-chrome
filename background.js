@@ -73,13 +73,13 @@ function showWindows(request , index){
 
             if( alternateWindow === false ){
                 chrome.windows.create( {
-                    height: parseInt(window.height),
-                    left: parseInt(window.width / 2 + 8),
+                    height: parseInt( window.height ),
+                    left: parseInt( window.left + ( window.width / 2 ), 10 ),
                     state: 'normal',
-                    top: parseInt(0),
+                    top: parseInt( window.top, 10 ) ,
                     type: 'normal',
                     url: link,
-                    width: parseInt(window.width / 2 + 8)
+                    width: parseInt( window.width / 2 )
                 }, function( createdWindowData ) {
                     alternateWindow = createdWindowData;
                     console.log( alternateWindow );
@@ -92,9 +92,8 @@ function showWindows(request , index){
             }
 
             chrome.windows.update( window.id, {
-                height: parseInt(window.height),
                 state: 'normal',
-                width: parseInt(window.width / 2 + 8)
+                width: parseInt( window.width / 2, 10 )
             });
         });
     } else {
@@ -188,6 +187,7 @@ chrome.runtime.onMessage.addListener(
                         break;
                     }
                 }
+
                 sendResponse({
                     status: termStatus
                 });
