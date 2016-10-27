@@ -41,7 +41,10 @@ xhr.send();
 
 
 function showWindows(request , index){
-    console.log(currentTerms[index][request.term]);
+    if( doLog ){
+        console.log(currentTerms[index][request.term]);
+    }
+
     if( typeof currentURL !== 'undefined' && typeof currentTerms !== 'undefined' ){
         var link = currentURL + currentTerms[index][request.term];
 
@@ -133,107 +136,110 @@ function getSelector( request, sender, sendResponse ){
     }
 }
 
+
+
+
 chrome.runtime.onMessage.addListener(
     function( request, sender, sendResponse ) {
-        //From content script
-        if( request.action === 'getRunState' ){
-            chrome.storage.sync.get( 'runState', function(data) {
-                sendResponse({
-                    runState: data.runState
-                });
-            });
-        } else if( request.action === 'getSelector' ){
-            getSelector( request, sender, sendResponse );
-        } else if(request.action === 'searchForTerm'){
-            var termStatus = 'term not found';
-            console.log('received term: ', request.term);
-            console.log('currentTerms: ', currentTerms);
-            if(typeof currentTerms !== 'undefined'){
-                console.log('currentTerms is defined');
-                for(var i = 0; i < currentTerms.length; i++ ){
-                    if(currentTerms[i].hasOwnProperty( request.term )){
-                        if( doLog ){
-                            console.log('term is found', request);
-                        }
-                        termStatus = 'term was found';
+        switch(request.action){
 
-                        showWindows( request , i );
-                        break;
-                    }
-                }
-                sendResponse({
-                    status: termStatus
-                });
-            }
-        } else if(request.action === 'updateTabURL'){
-            chrome.tabs.query({
-                active: true,
-                currentWindow: true
-            }, function(tabs) {
-                var tabURL = tabs[0].url;
-                console.log(tabURL);
-                parseInputField = request.parseInputField;
-                var newURL = currentURL + request.term;
-                console.log('new url: ', newURL);
-                chrome.tabs.update(tabs[0].id, {url: newURL});
+            case 'getSelector':
+                getSelector( request, sender, sendResponse );
+                break;
+
+            case 'searchForTerm':
+                var termStatus = 'term not found';
                 if( doLog ){
-                    console.log('tabURL: ', tabs[0].url );
+                    console.log('received term: ', request.term);
+                    console.log('currentTerms: ', currentTerms);
                 }
-            });
-        }
-
-        //From popup
-        else if( request.action === 'changeRunState' ){
-
-            if( doLog ){
-                console.log( 'ChangeRunState from popup / current value is: ', currentState );
-            }
-
-            if( currentState === 'enabled'){
-                currentState = 'disabled';
-            } else {
-                currentState = 'enabled';
-            }
-
-            chrome.storage.sync.set({ runState: currentState },
-                function () {
+                if(typeof currentTerms !== 'undefined'){
                     if( doLog ){
-                        console.log( 'Saved', 'runState', currentState );
+                        console.log('currentTerms is defined');
                     }
-
-                    chrome.tabs.query({
-                        active: true,
-                        currentWindow: true
-                    }, function( tabs ) {
-                        chrome.tabs.sendMessage( tabs[0].id, {
-                            action: 'changeRunState',
-                            runState: currentState
-                        }, function( response ) {
-                            if( response ){
-                                if( doLog ){
-                                    console.log( response.message );
-                                }
-                            } else {
-                                if( doLog ){
-                                    console.log('Content script not injected');
-                                }
+                    for(var i = 0; i < currentTerms.length; i++ ){
+                        if(currentTerms[i].hasOwnProperty( request.term )){
+                            if( doLog ){
+                                console.log('term is found', request);
                             }
-                        });
-                    });
+                            termStatus = 'term was found';
 
+                            showWindows( request , i );
+                            break;
+                        }
+                    }
                     sendResponse({
-                        runState: currentState
+                        status: termStatus
                     });
                 }
-            );
-        } else if( request.action === 'getRunState' ){
-            sendResponse({
-                runState: currentState
-            });
-        } else {
-            if( doLog ){
-                console.log( 'Message to event page was not handled: ', request );
-            }
+                break;
+
+            case 'updateTabURL':
+                chrome.tabs.query({
+                    active: true,
+                    currentWindow: true
+                }, function(tabs) {
+                    var newURL = currentURL + request.term;
+                    chrome.tabs.update( tabs[0].id, {
+                        url: newURL
+                    });
+                });
+                break;
+
+            case 'getRunState':
+                sendResponse({
+                    runState: currentState
+                });
+                break;
+
+            case 'changeRunState':
+                if( doLog ){
+                    console.log( 'ChangeRunState from popup / current value is: ', currentState );
+                }
+
+                if( currentState === 'enabled'){
+                    currentState = 'disabled';
+                } else {
+                    currentState = 'enabled';
+                }
+
+                chrome.storage.sync.set({ runState: currentState },
+                    function () {
+                        if( doLog ){
+                            console.log( 'Saved', 'runState', currentState );
+                        }
+
+                        chrome.tabs.query({
+                            active: true,
+                            currentWindow: true
+                        }, function( tabs ) {
+                            chrome.tabs.sendMessage( tabs[0].id, {
+                                action: 'changeRunState',
+                                runState: currentState
+                            }, function( response ) {
+                                if( response ){
+                                    if( doLog ){
+                                        console.log( response.message );
+                                    }
+                                } else {
+                                    if( doLog ){
+                                        console.log('Content script not injected');
+                                    }
+                                }
+                            });
+                        });
+
+                        sendResponse({
+                            runState: currentState
+                        });
+                    }
+                );
+                break;
+
+            default:
+                if( doLog ){
+                    console.log( 'Message to event page was not handled: ', request );
+                }
         }
 
         return true;

@@ -4,8 +4,9 @@
     var elements;
     var runSetUI = true;
     var inputSelector;
-
-
+    var titleTerm = false;
+    var englishTerms;
+    var testStatus = true;
 
     function sendText( text ){
         if( runState === 'enabled' && typeof text !== 'undefined' ){
@@ -21,18 +22,25 @@
         }
     }
 
+    function getTitle(){
+        var currentTitle = document.getElementsByTagName( 'title' )[ 0 ].innerText;
+        var event;
+
+        if( currentTitle !== titleTerm ){
+            console.log( 'got new term from title' );
+            event = new Event( 'term' );
+            window.dispatchEvent( event );
+
+            titleTerm = currentTitle;
+        }
+    }
+
     function addListeners( selectorAutoComplete, selectorButton ){
         var searchButtons;
         var inputSelectors;
 
-        //Gets value from search field if enter is pressed
-    /*    window.addEventListener( 'keydown', function( event ){
-            if( event.keyCode === 13 ){
-                console.log('enter was pressed');
-                getSearchTerm();
-            }
-        });
-    */
+        setInterval( getTitle, 100 );
+
         //Gets value autocomplete and checks parent and child elements
         if(typeof selectorAutoComplete !== 'undefined'){
             window.addEventListener('click', function (event) {
@@ -57,6 +65,8 @@
             });
         }
 
+
+
         //Gets value from searchField when search button is clicked
         if(typeof selectorButton !== 'undefined'){
             searchButtons = document.querySelectorAll(selectorButton);
@@ -68,21 +78,33 @@
             }
         }
 
+
+        //Gets value from pressing enter ( autocomplete and regular search with enter )
+//-------------------------------------------------------
+        window.addEventListener( 'term', function(){
+                console.log('in eventlistener set ui');
+                setEngineUI();
+                getSearchTerm();
+        });
+
+//-------------------------------------------------------
+
+
+
         //Gets value from drop-down list
         if(document.getElementById('termList') !== null){
+            console.log('in get element from drop down');
             document.getElementById('termList').addEventListener('change', function(event){
                 var term = document.getElementById('termList').value;
-            //    sendText(document.getElementById('termList').value);
                 inputSelectors = document.querySelectorAll(inputSelector);
 
                 if( inputSelectors.length > 0 ){
-                    document.querySelectorAll(inputSelector)[0].value = document.getElementById('termList').value;
+                    document.querySelectorAll(inputSelector)[0].value = term;
                 }
                 document.getElementById("termList").selectedIndex = 0;
                 chrome.runtime.sendMessage({
                     action: "updateTabURL",
-                    term: term,
-                    parseInputField: false
+                    term: term
                 });
             });
         }
@@ -92,15 +114,13 @@
     function getSearchTerm(){
         console.log('SelectorInput: ', inputSelector);
         elements = document.querySelectorAll(inputSelector);
-
         if( elements.length === 0 ){
-    //        setTimeout( init, 100 );
-            console.log( 'Could not find ', inputSelector );
+            setTimeout( getSearchTerm, 100 );
+            console.log( inputSelector, '`s length was 0' );
             return false;
         }
 
         var element = elements[ 0 ];
-
         if( element.value.length > 0 ){
             console.log('if value is > 0');
             sendText( element.value );
@@ -129,28 +149,48 @@
         return selectList;
     }
 
-    function setUI(englishTerms){
-        var selectList = getSelectList( englishTerms );
+    function setEngineUI(){
+        if( inputSelector === '.gsfi' ){
+            console.log('in Googles UI');
+            var element = document.querySelectorAll('.sfbgg');
+            if(element.length > 0){
+                element[0].setAttribute("style","height: 90px; background-color: #f1f1f1; border-bottom: 1px solid #666; border-color: #e5e5e5; min-width: 980px;");
+            }
+            document.getElementById('top_nav').setAttribute("style","margin-top: 31px; min-width: 980px; webkit-user-select: none;");
+        }
+        else if( inputSelector === '.b_searchbox' ){
+            console.log('setting Bings UI');
+            document.getElementById('rfPane').setAttribute("style","margin-top: 31px; background: #fff; z-index: 3; width: 100%; left: 0; min-width: 990px; padding-top: 5px;");
+            //console.log("Current marginTop: " + window.getComputedStyle(document.getElementById('rfPane')).marginTop);
+        }
+    }
 
+
+    function setUI(){
+        setEngineUI();
+        var selectList = getSelectList( englishTerms );
+        var elmnt = document.querySelectorAll('.tsf-p');
         //Adapt Google UI
         if(inputSelector === '.gsfi'){
-            console.log('in googles UI');
-            document.querySelectorAll('.sfbgg')[0].setAttribute("style","height: 90px");
-            document.getElementById('top_nav').setAttribute("style","margin-top: 31px;");
-            document.querySelectorAll('.tsf-p')[0].appendChild(selectList);
+            if(elmnt.length > 0){
+                elmnt[0].appendChild(selectList);
+            }
         }
 
-        //Adapt Bing UI
+        //Add select list to Bings UI
         else if(inputSelector === '.b_searchbox'){
-            console.log('in Bings UI');
-            document.getElementById('ftr_pane').setAttribute("style","margin-top: 31px;");
             //Create and append select list
             var div = document.createElement("DIV");
             div.setAttribute("style", "margin-top: 5px; margin-left: 100px;");
             div.appendChild(selectList);
-            document.getElementById('b_header').insertBefore(div, document.querySelectorAll('.b_scopebar')[0]);
+            var element = document.querySelectorAll('.b_scopebar');
+            if(element.length > 0){
+                document.getElementById('b_header').insertBefore(div, element[0]);
+            }
         }
     }
+
+
 
     function init(){
         console.log('In init');
@@ -162,9 +202,12 @@
                 inputSelector = response.selectorSearchField;
 
                 if(runSetUI !== false){
-                    setUI(response.englishTerms);
+                    englishTerms = response.englishTerms;
+                    setUI();
                     runSetUI = false;
                 }
+
+                titleTerm = document.getElementsByTagName( 'title' )[ 0 ].innerText;
                 addListeners( response.selectorAutoComplete, response.selectorButton );
                 getSearchTerm();
             } else {
