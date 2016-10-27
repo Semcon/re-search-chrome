@@ -3,6 +3,8 @@ var currentTerms;
 var currentURL;
 var jsonData;
 var doLog = false;
+var alternateWindow = false;
+var windowBeforeUpdateState = false;
 
 var DATA_URL = 'https://api.myjson.com/bins/4e30w';
 
@@ -15,7 +17,7 @@ chrome.storage.sync.get( 'runState', function(data) {
         console.log( 'val: ', currentState );
     }
 
-    if( typeof enabled === 'undefined' ){
+    if( typeof currentState === 'undefined' ){
         currentState = 'enabled';
         chrome.storage.sync.set( {
             runState: currentState
@@ -29,6 +31,21 @@ chrome.storage.sync.get( 'runState', function(data) {
     return true;
 });
 
+chrome.windows.onRemoved.addListener( function( windowId ){
+    console.log( 'Window removed' );
+
+    if( windowId === alternateWindow.id ){
+        chrome.windows.update( windowBeforeUpdateState.id, {
+            left: windowBeforeUpdateState.left,
+            top: windowBeforeUpdateState.top,
+            width: windowBeforeUpdateState.width,
+            height: windowBeforeUpdateState.height,
+            focused: windowBeforeUpdateState.focused
+        } );
+
+        alternateWindow = false;
+    }
+} );
 
 var xhr = new XMLHttpRequest();
 xhr.open( 'GET', DATA_URL, true );
@@ -39,8 +56,8 @@ xhr.onreadystatechange = function() {
 }
 xhr.send();
 
-
 function showWindows(request , index){
+
     if( doLog ){
         console.log(currentTerms[index][request.term]);
     }
@@ -57,21 +74,32 @@ function showWindows(request , index){
                 console.log( window );
             }
 
-            chrome.windows.create( {
-                height: parseInt(window.height),
-                left: parseInt(window.width / 2 + 8),
-                state: 'normal',
-                top: parseInt(0),
-                type: 'normal',
-                url: link,
-                width: parseInt(window.width / 2 + 8)
-            });
+            windowBeforeUpdateState = window;
 
-            chrome.windows.update( window.id, {
-                height: parseInt(window.height),
-                state: 'normal',
-                width: parseInt(window.width / 2 + 8)
-            });
+            if( alternateWindow === false ){
+                chrome.windows.create( {
+                    height: parseInt( window.height ),
+                    left: parseInt( window.left + ( window.width / 2 ), 10 ),
+                    state: 'normal',
+                    top: parseInt( window.top, 10 ) ,
+                    type: 'normal',
+                    url: link,
+                    width: parseInt( window.width / 2 )
+                }, function( createdWindowData ) {
+                    alternateWindow = createdWindowData;
+                    console.log( alternateWindow );
+                });
+
+                chrome.windows.update( window.id, {
+                    state: 'normal',
+                    width: parseInt( window.width / 2, 10 )
+                });
+            } else {
+                console.log( 'Should update alternate window' );
+                chrome.tabs.update( alternateWindow.tabs[ 0 ].id, {
+                    url: link
+                });
+            }
         });
     } else {
         if( doLog ){
