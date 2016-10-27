@@ -80,16 +80,15 @@ function showWindows(request , index){
                 windowBeforeUpdateState = window;
 
                 chrome.windows.create( {
-                    height: parseInt( window.height ),
+                    height: parseInt( window.height, 10 ),
                     left: parseInt( window.left + ( window.width / 2 ), 10 ),
                     state: 'normal',
                     top: parseInt( window.top, 10 ) ,
                     type: 'normal',
                     url: link,
-                    width: parseInt( window.width / 2 )
+                    width: parseInt( window.width / 2, 10 )
                 }, function( createdWindowData ) {
                     alternateWindow = createdWindowData;
-                    console.log( alternateWindow );
                 });
 
                 chrome.windows.update( window.id, {
@@ -97,7 +96,10 @@ function showWindows(request , index){
                     width: parseInt( window.width / 2, 10 )
                 });
             } else {
-                console.log( 'Should update alternate window' );
+                if( doLog ){
+                    console.log( 'Should update alternate window' );
+                }
+
                 chrome.tabs.update( alternateWindow.tabs[ 0 ].id, {
                     url: link
                 });
