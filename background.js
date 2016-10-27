@@ -32,7 +32,9 @@ chrome.storage.sync.get( 'runState', function(data) {
 });
 
 chrome.windows.onRemoved.addListener( function( windowId ){
-    console.log( 'Window removed' );
+    if( doLog ){
+        console.log( 'Window removed', windowId );
+    }
 
     if( windowId === alternateWindow.id ){
         chrome.windows.update( windowBeforeUpdateState.id, {
@@ -74,9 +76,9 @@ function showWindows(request , index){
                 console.log( window );
             }
 
-            windowBeforeUpdateState = window;
-
             if( alternateWindow === false ){
+                windowBeforeUpdateState = window;
+
                 chrome.windows.create( {
                     height: parseInt( window.height ),
                     left: parseInt( window.left + ( window.width / 2 ), 10 ),
