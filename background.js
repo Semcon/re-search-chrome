@@ -3,6 +3,8 @@ var currentTerms;
 var currentURL;
 var jsonData;
 var doLog = false;
+var alternateWindowId = false;
+var windowBeforeUpdateState = false;
 
 var DATA_URL = 'https://api.myjson.com/bins/4e30w';
 
@@ -29,6 +31,20 @@ chrome.storage.sync.get( 'runState', function(data) {
     return true;
 });
 
+chrome.windows.onRemoved.addListener( function( windowId ){
+    console.log( 'Window removed' );
+
+    if( windowId === alternateWindowId ){
+        chrome.windows.update( windowBeforeUpdateState.id, {
+            left: windowBeforeUpdateState.left,
+            top: windowBeforeUpdateState.top,
+            width: windowBeforeUpdateState.width,
+            height: windowBeforeUpdateState.height,
+            focused: windowBeforeUpdateState.focused
+        } );
+        alternateWindowId = false;
+    }
+} );
 
 var xhr = new XMLHttpRequest();
 xhr.open( 'GET', DATA_URL, true );
@@ -39,9 +55,9 @@ xhr.onreadystatechange = function() {
 }
 xhr.send();
 
-
 function showWindows(request , index){
     console.log(currentTerms[index][request.term]);
+
     if( typeof currentURL !== 'undefined' && typeof currentTerms !== 'undefined' ){
         var link = currentURL + currentTerms[index][request.term];
 
@@ -54,6 +70,8 @@ function showWindows(request , index){
                 console.log( window );
             }
 
+            windowBeforeUpdateState = window;
+
             chrome.windows.create( {
                 height: parseInt(window.height),
                 left: parseInt(window.width / 2 + 8),
@@ -62,6 +80,8 @@ function showWindows(request , index){
                 type: 'normal',
                 url: link,
                 width: parseInt(window.width / 2 + 8)
+            }, function( createdWindowData ) {
+                alternateWindowId = createdWindowData.id;
             });
 
             chrome.windows.update( window.id, {
