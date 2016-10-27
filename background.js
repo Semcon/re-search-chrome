@@ -84,17 +84,17 @@ function showWindows(request , index){
                     alternateWindow = createdWindowData;
                     console.log( alternateWindow );
                 });
+
+                chrome.windows.update( window.id, {
+                    state: 'normal',
+                    width: parseInt( window.width / 2, 10 )
+                });
             } else {
                 console.log( 'Should update alternate window' );
                 chrome.tabs.update( alternateWindow.tabs[ 0 ].id, {
                     url: link
                 });
             }
-
-            chrome.windows.update( window.id, {
-                state: 'normal',
-                width: parseInt( window.width / 2, 10 )
-            });
         });
     } else {
         if( doLog ){
