@@ -46,6 +46,16 @@ chrome.windows.onRemoved.addListener( function( windowId ){
         } );
 
         alternateWindow = false;
+    } else if ( windowId = originWindow.id ){
+        chrome.windows.update( alternateWindow.id, {
+            left: originWindow.left,
+            top: originWindow.top,
+            width: originWindow.width,
+            height: originWindow.height,
+            focused: originWindow.focused
+        } );
+
+        alternateWindow = false;
     }
 } );
 
@@ -211,7 +221,7 @@ chrome.runtime.onMessage.addListener(
 
                             termStatus = 'term was found';
                             showWindows( request, i, sender.tab.windowId );
-                            
+
                             break;
                         }
                     }
