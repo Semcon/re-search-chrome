@@ -109,8 +109,7 @@
         }
         else if( inputSelector === '.b_searchbox' ){
             console.log('setting Bings UI');
-            document.getElementById('rfPane').setAttribute("style","margin-top: 31px; background: #fff; z-index: 3; width: 100%; left: 0; min-width: 990px; padding-top: 5px;");
-            //console.log("Current marginTop: " + window.getComputedStyle(document.getElementById('rfPane')).marginTop);
+            document.getElementById('rfPane').setAttribute("style","margin-top: 31px !important; background: #fff; z-index: 3; width: 100%; left: 0; min-width: 990px; padding-top: 5px;");
         }
     }
     

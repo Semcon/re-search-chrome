@@ -241,13 +241,14 @@ chrome.runtime.onMessage.addListener(
                     queryOptions.currentWindow = true;
                 }
 
-                chrome.tabs.query( queryOptions, function(tabs) {
-                    var newURL = currentURL + request.term;
-                    chrome.tabs.update( tabs[0].id, {
-                        url: newURL
+                if( typeof currentURL !== 'undefined' ){
+                    chrome.tabs.query( queryOptions, function(tabs) {
+                         var newURL = currentURL + request.term;
+                         chrome.tabs.update( tabs[0].id, {
+                             url: newURL
+                         });
                     });
-                });
-
+                }
                 break;
 
             case 'getRunState':
