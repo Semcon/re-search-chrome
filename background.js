@@ -112,7 +112,7 @@ function showWindows(request , index){
     }
 }
 
-function getSelector( request, sender, sendResponse ){
+function getEngineInformation( request, sender, sendResponse ){
     //content script is asking for selector
     var url = request.url;
     var currentEngine;
@@ -175,8 +175,8 @@ chrome.runtime.onMessage.addListener(
     function( request, sender, sendResponse ) {
         switch(request.action){
 
-            case 'getSelector':
-                getSelector( request, sender, sendResponse );
+            case 'getEngineInformation':
+                getEngineInformation( request, sender, sendResponse );
                 break;
 
             case 'searchForTerm':

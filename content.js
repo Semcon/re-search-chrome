@@ -196,7 +196,7 @@
     function init(){
         console.log('In init');
         chrome.runtime.sendMessage({
-            action: 'getSelector',
+            action: 'getEngineInformation',
             url: window.location.href
         }, function(response) {
             if( response.selectorSearchField !== false ){
