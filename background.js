@@ -173,8 +173,6 @@ function getEngineInformation( request, sender, sendResponse ){
 
                 sendResponse({
                     selectorSearchField: currentEngine.selectors.input,
-                    selectorButton: currentEngine.selectors.button,
-                    selectorAutoComplete: currentEngine.selectors.autocomplete,
                     englishTerms: jsonData.terms[currentEngine.terms].eng
                 });
 
