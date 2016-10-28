@@ -37,7 +37,7 @@
     }
 
     function addListeners(){
-        setInterval( getTitle, 100 );
+        setInterval( getTitle, 64 );
 
         window.addEventListener( 'term', function(){
             console.log('in eventlistener set ui');
