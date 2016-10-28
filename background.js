@@ -68,14 +68,14 @@ xhr.onreadystatechange = function() {
 }
 xhr.send();
 
-function showWindows(request, index, windowOriginId ){
+function showWindows( request, newTerm, windowOriginId ){
 
     if( doLog ){
-        console.log(currentTerms[index][request.term]);
+        console.log( request.term );
     }
 
-    if( typeof currentURL !== 'undefined' && typeof currentTerms !== 'undefined' ){
-        var link = currentURL + currentTerms[index][request.term];
+    if( typeof currentURL !== 'undefined' ){
+        var link = currentURL + newTerm;
         var originLink = currentURL + request.term;
 
         if( doLog ){
@@ -118,7 +118,7 @@ function showWindows(request, index, windowOriginId ){
                 chrome.tabs.query( {
                     active: true,
                     windowId: originWindow.id
-                }, function(tabs) {
+                }, function( tabs ) {
                     chrome.tabs.update( tabs[0].id, {
                         url: originLink
                     });
@@ -166,7 +166,7 @@ function getEngineInformation( request, sender, sendResponse ){
                 currentEngine = jsonData.engines[ i ];
                 currentTerms = [];
                 for(var key in jsonData.terms[currentEngine.terms]){
-                    currentTerms.push(jsonData.terms[currentEngine.terms][key]);
+                    currentTerms.push( jsonData.terms[ currentEngine.terms ][ key ] );
                 }
 
                 currentURL = currentEngine.url;
@@ -202,11 +202,15 @@ chrome.runtime.onMessage.addListener(
 
             case 'searchForTerm':
                 var termStatus = 'term not found';
+                var lowercaseTerms;
 
                 if( doLog ){
                     console.log('received term: ', request.term);
                     console.log('currentTerms: ', currentTerms);
+                    console.log( 'Using term: ', request.term.toLowerCase() );
                 }
+
+                request.term = request.term.toLowerCase();
 
                 if(typeof currentTerms !== 'undefined'){
                     if( doLog ){
@@ -214,13 +218,19 @@ chrome.runtime.onMessage.addListener(
                     }
 
                     for(var i = 0; i < currentTerms.length; i++ ){
-                        if(currentTerms[i].hasOwnProperty( request.term )){
+                        console.log( currentTerms[ i ] );
+                        lowercaseTerms = Object.keys( currentTerms[ i ] ).map( function( string ){
+                            return string.toLowerCase();
+                        });
+
+                        if( lowercaseTerms.indexOf( request.term ) > -1 ){
                             if( doLog ){
                                 console.log('term is found', request);
                             }
 
                             termStatus = 'term was found';
-                            showWindows( request, i, sender.tab.windowId );
+
+                            showWindows( request, currentTerms[ i ][ Object.keys( currentTerms[ i ] )[ lowercaseTerms.indexOf( request.term ) ] ], sender.tab.windowId );
 
                             break;
                         }
