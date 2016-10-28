@@ -1,42 +1,35 @@
-function clickHandler( event ) {
-    chrome.runtime.sendMessage({action: "changeRunState"}, function(response) {
-        console.log("Run state is: " , response.runState);
-        var runState = response.runState;
+(function(){
 
-        if( runState === 'enabled' ){
-            console.log('value',document.getElementsByName("stateBtn")[0].childNodes[0].nodeValue);
-            var btn = document.getElementsByName("stateBtn")[0];
-            btn.childNodes[0].nodeValue = 'ON';
-        } else if(runState === 'disabled'){
-            console.log(document.getElementsByName("stateBtn")[0].childNodes[0].nodeValue);
-            var btn = document.getElementsByName("stateBtn")[0];
-            btn.childNodes[0].nodeValue = 'OFF';
+    function switchState( element ){
+        if( element.classList.contains( 'switchbtn-on' ) ) {
+            element.classList.remove( 'switchbtn-on' );
+            element.classList.add( 'switchbtn-off' );
+        } else {
+            element.classList.remove( 'switchbtn-off' );
+            element.classList.add( 'switchbtn-on' );
         }
-    });
-}
+    }
 
-document.addEventListener('DOMContentLoaded', function () {
-    console.log('domContentLoaded');
-    chrome.runtime.sendMessage({
-        action: "getRunState"
-    }, function(response) {
-        console.log("Run state is: " , response.runState);
-        var runState = response.runState;
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log('domContentLoaded');
 
-        if( runState === 'enabled' ){
-            var btn = document.createElement("BUTTON");
-            btn.name = 'stateBtn';
-            btn.addEventListener('click', clickHandler);
-            var t = document.createTextNode("ON")
-            btn.appendChild(t);
-            document.body.appendChild(btn);
-        } else if(runState === 'disabled'){
-            var btn = document.createElement("BUTTON");
-            btn.name = 'stateBtn';
-            btn.addEventListener('click', clickHandler);
-            var t = document.createTextNode("OFF");
-            btn.appendChild(t);
-            document.body.appendChild(btn);
-        }
+        document.querySelectorAll( '.js-power-button' )[ 0 ].addEventListener("click", function( event ){
+            chrome.runtime.sendMessage({
+                action: "changeRunState"
+            }, function(response) {
+                switchState( document.querySelectorAll( '.js-power-button' )[ 0 ] );
+            });
+        });
+
+        chrome.runtime.sendMessage({
+            action: "getRunState"
+        }, function(response) {
+            console.log("Run state is: " , response.runState);
+            var enabledButtons = document.querySelectorAll( '.switchbtn-on' );
+
+            if( response.runState === 'disabled' && enabledButtons.length > -1 ){
+                switchState( enabledButtons[ 0 ] );
+            }
+        });
     });
-});
+})();
