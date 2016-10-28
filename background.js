@@ -4,7 +4,7 @@ var currentURL;
 var jsonData;
 var doLog = false;
 var alternateWindow = false;
-var windowBeforeUpdateState = false;
+var originWindow = false;
 
 var DATA_URL = 'https://api.myjson.com/bins/4e30w';
 
@@ -37,12 +37,12 @@ chrome.windows.onRemoved.addListener( function( windowId ){
     }
 
     if( windowId === alternateWindow.id ){
-        chrome.windows.update( windowBeforeUpdateState.id, {
-            left: windowBeforeUpdateState.left,
-            top: windowBeforeUpdateState.top,
-            width: windowBeforeUpdateState.width,
-            height: windowBeforeUpdateState.height,
-            focused: windowBeforeUpdateState.focused
+        chrome.windows.update( originWindow.id, {
+            left: originWindow.left,
+            top: originWindow.top,
+            width: originWindow.width,
+            height: originWindow.height,
+            focused: originWindow.focused
         } );
 
         alternateWindow = false;
@@ -58,7 +58,7 @@ xhr.onreadystatechange = function() {
 }
 xhr.send();
 
-function showWindows(request , index){
+function showWindows(request, index, windowOriginId ){
 
     if( doLog ){
         console.log(currentTerms[index][request.term]);
@@ -66,18 +66,19 @@ function showWindows(request , index){
 
     if( typeof currentURL !== 'undefined' && typeof currentTerms !== 'undefined' ){
         var link = currentURL + currentTerms[index][request.term];
+        var originLink = currentURL + request.term;
 
         if( doLog ){
             console.log( 'Link: ' , link );
         }
 
-        chrome.windows.getCurrent( {}, function( window ){
-            if( doLog ){
-                console.log( window );
-            }
+        if( alternateWindow === false ){
+            chrome.windows.getCurrent( {}, function( window ){
+                if( doLog ){
+                    console.log( window );
+                }
 
-            if( alternateWindow === false ){
-                windowBeforeUpdateState = window;
+                originWindow = window;
 
                 chrome.windows.create( {
                     height: parseInt( window.height, 10 ),
@@ -95,16 +96,27 @@ function showWindows(request , index){
                     state: 'normal',
                     width: parseInt( window.width / 2, 10 )
                 });
-            } else {
-                if( doLog ){
-                    console.log( 'Should update alternate window' );
-                }
+            });
+        } else {
+            if( doLog ){
+                console.log( 'Should update alternate window' );
+            }
 
-                chrome.tabs.update( alternateWindow.tabs[ 0 ].id, {
-                    url: link
+            if( windowOriginId === alternateWindow.id ){
+                chrome.tabs.query( {
+                    active: true,
+                    windowId: originWindow.id
+                }, function(tabs) {
+                    chrome.tabs.update( tabs[0].id, {
+                        url: originLink
+                    });
                 });
             }
-        });
+
+            chrome.tabs.update( alternateWindow.tabs[ 0 ].id, {
+                url: link
+            });
+        }
     } else {
         if( doLog ){
             console.log( 'currentURL and/or currentTerms is undefined' );
@@ -168,11 +180,10 @@ function getEngineInformation( request, sender, sendResponse ){
     }
 }
 
-
-
-
 chrome.runtime.onMessage.addListener(
     function( request, sender, sendResponse ) {
+        var queryOptions = {};
+
         switch(request.action){
 
             case 'getEngineInformation':
@@ -181,25 +192,30 @@ chrome.runtime.onMessage.addListener(
 
             case 'searchForTerm':
                 var termStatus = 'term not found';
+
                 if( doLog ){
                     console.log('received term: ', request.term);
                     console.log('currentTerms: ', currentTerms);
                 }
+
                 if(typeof currentTerms !== 'undefined'){
                     if( doLog ){
                         console.log('currentTerms is defined');
                     }
+
                     for(var i = 0; i < currentTerms.length; i++ ){
                         if(currentTerms[i].hasOwnProperty( request.term )){
                             if( doLog ){
                                 console.log('term is found', request);
                             }
-                            termStatus = 'term was found';
 
-                            showWindows( request , i );
+                            termStatus = 'term was found';
+                            showWindows( request, i, sender.tab.windowId );
+                            
                             break;
                         }
                     }
+
                     sendResponse({
                         status: termStatus
                     });
@@ -207,15 +223,21 @@ chrome.runtime.onMessage.addListener(
                 break;
 
             case 'updateTabURL':
-                chrome.tabs.query({
-                    active: true,
-                    currentWindow: true
-                }, function(tabs) {
+                queryOptions.active = true;
+
+                if( alternateWindow !== false ){
+                    queryOptions.windowId = originWindow.id
+                } else {
+                    queryOptions.currentWindow = true;
+                }
+
+                chrome.tabs.query( queryOptions, function(tabs) {
                     var newURL = currentURL + request.term;
                     chrome.tabs.update( tabs[0].id, {
                         url: newURL
                     });
                 });
+
                 break;
 
             case 'getRunState':
