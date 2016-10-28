@@ -23,7 +23,8 @@
     }
 
     function getTitle(){
-        var currentTitle = document.getElementsByTagName( 'title' )[ 0 ].innerText;
+        // http://perfectionkills.com/the-poor-misunderstood-innerText/
+        var currentTitle = document.getElementsByTagName( 'title' )[ 0 ].textContent;
         var event;
 
         if( currentTitle !== titleTerm ){
