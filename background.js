@@ -103,7 +103,9 @@ function showWindows(request, index, windowOriginId ){
                 });
 
                 chrome.windows.update( window.id, {
+                    left: parseInt( window.left, 10 ),
                     state: 'normal',
+                    top: parseInt( window.top, 10 ),
                     width: parseInt( window.width / 2, 10 )
                 });
             });
