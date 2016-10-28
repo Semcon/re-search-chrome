@@ -46,6 +46,16 @@ chrome.windows.onRemoved.addListener( function( windowId ){
         } );
 
         alternateWindow = false;
+    } else if ( windowId = originWindow.id && alternateWindow.id ){
+        chrome.windows.update( alternateWindow.id, {
+            left: originWindow.left,
+            top: originWindow.top,
+            width: originWindow.width,
+            height: originWindow.height,
+            focused: originWindow.focused
+        } );
+
+        alternateWindow = false;
     }
 } );
 
@@ -93,7 +103,9 @@ function showWindows(request, index, windowOriginId ){
                 });
 
                 chrome.windows.update( window.id, {
+                    left: parseInt( window.left, 10 ),
                     state: 'normal',
+                    top: parseInt( window.top, 10 ),
                     width: parseInt( window.width / 2, 10 )
                 });
             });
@@ -161,8 +173,6 @@ function getEngineInformation( request, sender, sendResponse ){
 
                 sendResponse({
                     selectorSearchField: currentEngine.selectors.input,
-                    selectorButton: currentEngine.selectors.button,
-                    selectorAutoComplete: currentEngine.selectors.autocomplete,
                     englishTerms: jsonData.terms[currentEngine.terms].eng
                 });
 

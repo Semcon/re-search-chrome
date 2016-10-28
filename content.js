@@ -35,74 +35,21 @@
         }
     }
 
-    function addListeners( selectorAutoComplete, selectorButton ){
-        var searchButtons;
-        var inputSelectors;
-
+    function addListeners(){
         setInterval( getTitle, 100 );
 
-        //Gets value autocomplete and checks parent and child elements
-        if(typeof selectorAutoComplete !== 'undefined'){
-            window.addEventListener('click', function (event) {
-                if ( String( event.target.classList ).indexOf( selectorAutoComplete.replace( '.', '' ) ) > -1 ) {
-                    console.log('autocomplete was clicked');
-                    console.log('autocomplete input: ' , event.target.outerText);
-                    sendText(event.target.outerText);
-                } else if(String(event.target.parentElement.classList).indexOf( selectorAutoComplete.replace( '.', '' ) ) > -1 ){
-                    console.log('autocomplete was clicked');
-                    sendText(event.target.parentElement.outerText);
-                } else if(event.target.children.length > 0){
-                    for( var i = 0; i < event.target.children.length; i++ ){
-                        if( event.target.children[ i ].children.length > 0 ){
-                            for ( var j = 0; j < event.target.children[ i ].children.length; j++ ) {
-                                if ( String( event.target.children[ i ].children[ j ].className ).indexOf( selectorAutoComplete.replace( '.', '' ) ) > -1 ) {
-                                    console.log( 'autocomplete was clicked' );
-                                    sendText( event.target.children[ i ].children[ j ].outerText );
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-
-
-        //Gets value from searchField when search button is clicked
-        if(typeof selectorButton !== 'undefined'){
-            searchButtons = document.querySelectorAll(selectorButton);
-            if( searchButtons.length > 0 ){
-                searchButtons[0].addEventListener('click', function () {
-                    console.log( 'got click' );
-                    getSearchTerm();
-                });
-            }
-        }
-
-
-        //Gets value from pressing enter ( autocomplete and regular search with enter )
-//-------------------------------------------------------
         window.addEventListener( 'term', function(){
-                console.log('in eventlistener set ui');
-                setEngineUI();
-                getSearchTerm();
+            console.log('in eventlistener set ui');
+            setEngineUI();
+            getSearchTerm();
         });
-
-//-------------------------------------------------------
-
-
 
         //Gets value from drop-down list
         if(document.getElementById('termList') !== null){
             console.log('in get element from drop down');
             document.getElementById('termList').addEventListener('change', function(event){
                 var term = document.getElementById('termList').value;
-                inputSelectors = document.querySelectorAll(inputSelector);
 
-                if( inputSelectors.length > 0 ){
-                    document.querySelectorAll(inputSelector)[0].value = term;
-                }
-                document.getElementById("termList").selectedIndex = 0;
                 chrome.runtime.sendMessage({
                     action: "updateTabURL",
                     term: term
@@ -164,8 +111,7 @@
             document.getElementById('rfPane').setAttribute("style","margin-top: 31px !important; background: #fff; z-index: 3; width: 100%; left: 0; min-width: 990px; padding-top: 5px;");
         }
     }
-
-
+    
     function setUI(){
         setEngineUI();
         var selectList = getSelectList( englishTerms );
@@ -190,8 +136,6 @@
         }
     }
 
-
-
     function init(){
         console.log('In init');
         chrome.runtime.sendMessage({
@@ -208,7 +152,7 @@
                 }
 
                 titleTerm = document.getElementsByTagName( 'title' )[ 0 ].innerText;
-                addListeners( response.selectorAutoComplete, response.selectorButton );
+                addListeners();
                 getSearchTerm();
             } else {
                 console.log('Selector not found');
