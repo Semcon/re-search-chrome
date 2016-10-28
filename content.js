@@ -104,6 +104,12 @@
         return selectList;
     }
 
+    function checkElementMarginTop( element ){
+        if( window.getComputedStyle(element, null).getPropertyValue("margin-top") !== '31px' ){
+            setEngineUI();
+        }
+    }
+
     function setEngineUI(){
         if( inputSelector === '.gsfi' ){
             console.log('in Googles UI');
@@ -111,11 +117,15 @@
             if(element.length > 0){
                 element[0].setAttribute("style","height: 90px; background-color: #f1f1f1; border-bottom: 1px solid #666; border-color: #e5e5e5; min-width: 980px;");
             }
-            document.getElementById('top_nav').setAttribute("style","margin-top: 31px; min-width: 980px; webkit-user-select: none;");
+            var elmnt = document.getElementById('top_nav');
+            elmnt.setAttribute("style","margin-top: 31px; min-width: 980px; webkit-user-select: none;");
+            setTimeout( checkElementMarginTop.bind( this, elmnt ), 450 );
         }
         else if( inputSelector === '.b_searchbox' ){
             console.log('setting Bings UI');
-            document.getElementById('rfPane').setAttribute("style","margin-top: 31px !important; background: #fff; z-index: 3; width: 100%; left: 0; min-width: 990px; padding-top: 5px;");
+            var elmnt2 = document.getElementById('rfPane');
+            elmnt2.setAttribute("style","margin-top: 31px; background: #fff; z-index: 3; width: 100%; left: 0; min-width: 990px; padding-top: 5px;");
+            setTimeout( checkElementMarginTop.bind( this, elmnt2 ), 450 );
         }
     }
 
