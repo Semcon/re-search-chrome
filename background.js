@@ -6,7 +6,7 @@ var doLog = false;
 var alternateWindow = false;
 var originWindow = false;
 
-var DATA_URL = 'https://api.myjson.com/bins/4e30w';
+var DATA_URL = 'https://api.myjson.com/bins/1rq4a';
 
 //First time running script to check what value runState is in chrome storage.
 //If runState is undefined it is gets set to enabled otherwise it gets the value.
