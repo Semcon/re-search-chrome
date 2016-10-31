@@ -4,7 +4,9 @@ var currentURL;
 var jsonData;
 var doLog = false;
 var alternateWindow = false;
+var alternateTab = false;
 var originWindow = false;
+var originTab = false;
 
 var DATA_URL = 'https://api.myjson.com/bins/1rq4a';
 
@@ -100,6 +102,18 @@ function showWindows( request, newTerm, windowOriginId ){
                     width: parseInt( window.width / 2, 10 )
                 }, function( createdWindowData ) {
                     alternateWindow = createdWindowData;
+
+                    chrome.tabs.query( {
+                        active: true,
+                        windowId: alternateWindow.id
+                    }, function(tabs) {
+
+                        if( doLog ){
+                            console.log('alternate tab ID: ' , tabs[0].id);
+                        }
+
+                        alternateTab = tabs[0].id;
+                    });
                 });
 
                 chrome.windows.update( window.id, {
@@ -125,8 +139,9 @@ function showWindows( request, newTerm, windowOriginId ){
                 });
             }
 
-            chrome.tabs.update( alternateWindow.tabs[ 0 ].id, {
-                url: link
+            chrome.tabs.update( alternateTab, {
+                url: link,
+                active: true
             });
         }
     } else {
