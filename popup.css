@@ -1,0 +1,59 @@
+body {
+    display: block;
+    height: 100%;
+    width: 300px;
+}
+
+body * {
+    box-sizing: border-box;
+}
+
+.popup-menu {
+    background-color: #fff;
+    border: 1px solid #555;
+    font-size: 200%;
+    padding: 5%;
+    text-align: center;
+    word-wrap: break-word;
+}
+
+svg {
+    height: 110px;
+    width: 110px;
+}
+
+svg:hover {
+    cursor: pointer;
+}
+
+.switchbtn-on path {
+    fill: #91DC5A;
+}
+
+.switchbtn-off path {
+    fill: #000;
+}
+
+.link-class {
+    font-size: 140%;
+    word-wrap: break-word;
+}
+
+.share-button {
+    display: inline-block;
+    height: 64px;
+    list-style: none;
+    list-style: none;
+    margin: 10px;
+    width: 64px;
+}
+
+.twitter-share-button {
+    background-image:url(http://www.iconsdb.com/icons/download/gray/twitter-64.png);
+    background-repeat: no-repeat;
+}
+
+.facebook-share-button {
+    background-image:url(http://www.iconsdb.com/icons/download/icon-sets/grey-wall/facebook-6-64.png);
+    background-repeat: no-repeat;
+}

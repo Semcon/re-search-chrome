@@ -76,8 +76,10 @@
         }
     }
 
-    function getSelectList( terms ){
+    function getSelectList( termsData ){
         //Create and append select list
+        var terms = Object.keys( termsData );
+
         var selectList = document.createElement("SELECT");
         selectList.setAttribute("style","height: 25px; width: 164px; margin-top: 5px");
         selectList.id = "termList";
@@ -87,11 +89,15 @@
         defaultOption.text = 'Other Re-search terms';
         selectList.add(defaultOption);
 
+        terms.sort(function (a, b) {
+            return a.localeCompare(b);
+        });
+
         //Create and append the options
-        for (var i = 0; i < Object.keys(terms).length; i++) {
+        for (var i = 0; i < terms.length; i++) {
             var option = document.createElement("option");
-            option.value = Object.keys(terms)[i];
-            option.text = Object.keys(terms)[i];
+            option.value = terms[i];
+            option.text = terms[i];
             selectList.add(option);
         }
 
