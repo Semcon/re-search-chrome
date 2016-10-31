@@ -45,18 +45,17 @@
             getSearchTerm();
         });
 
-        //Gets value from drop-down list
-        if(document.getElementById('termList') !== null){
-            console.log('in get element from drop down');
-            document.getElementById('termList').addEventListener('change', function(event){
-                var term = document.getElementById('termList').value;
+        window.addEventListener('change', function(event){
+            if( event.target.id === 'termList' ){
+                console.log('in get element from drop down');
+                var term = document.getElementById( 'termList' ).value;
 
                 chrome.runtime.sendMessage({
                     action: "updateTabURL",
                     term: term
                 });
-            });
-        }
+            }
+        });
     }
 
     //Gets search terms when different events occur.
