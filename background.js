@@ -46,7 +46,7 @@ chrome.windows.onRemoved.addListener( function( windowId ){
         } );
 
         alternateWindow = false;
-    } else if ( windowId = originWindow.id && alternateWindow.id ){
+    } else if ( windowId === originWindow.id && alternateWindow.id ){
         chrome.windows.update( alternateWindow.id, {
             left: originWindow.left,
             top: originWindow.top,
