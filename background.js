@@ -218,7 +218,6 @@ chrome.runtime.onMessage.addListener(
                     }
 
                     for(var i = 0; i < currentTerms.length; i++ ){
-                        console.log( currentTerms[ i ] );
                         lowercaseTerms = Object.keys( currentTerms[ i ] ).map( function( string ){
                             return string.toLowerCase();
                         });
