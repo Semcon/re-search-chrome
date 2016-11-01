@@ -61,6 +61,12 @@ chrome.windows.onRemoved.addListener( function( windowId ){
     }
 } );
 
+chrome.tabs.onRemoved.addListener( function( tabId ){
+    if( tabId === originTab ){
+        originTab = false;
+    }
+});
+
 var xhr = new XMLHttpRequest();
 xhr.open( 'GET', DATA_URL, true );
 xhr.onreadystatechange = function() {
@@ -91,6 +97,17 @@ function showWindows( request, newTerm, windowOriginId ){
                 }
 
                 originWindow = window;
+
+                chrome.tabs.query( {
+                    active: true,
+                    windowId: originWindow.id
+                }, function(tabs) {
+                    if( doLog ){
+                        console.log('origin tab ID: ' , tabs[0].id);
+                    }
+
+                    originTab = tabs[0].id;
+                });
 
                 chrome.windows.create( {
                     height: parseInt( window.height, 10 ),
@@ -129,14 +146,18 @@ function showWindows( request, newTerm, windowOriginId ){
             }
 
             if( windowOriginId === alternateWindow.id ){
-                chrome.tabs.query( {
-                    active: true,
-                    windowId: originWindow.id
-                }, function( tabs ) {
-                    chrome.tabs.update( tabs[0].id, {
+                if( originTab ){
+                    chrome.tabs.update( originTab, {
+                        active: true,
                         url: originLink
                     });
-                });
+                } else {
+                    chrome.tabs.create( {
+                        active: true,
+                        url: originLink,
+                        windowId: originWindow.id
+                    } );
+                }
             }
 
             chrome.tabs.update( alternateTab, {
@@ -261,20 +282,27 @@ chrome.runtime.onMessage.addListener(
 
                 if( alternateWindow !== false ){
                     queryOptions.windowId = originWindow.id
-                } else {
-                    queryOptions.currentWindow = true;
                 }
 
                 if( typeof currentURL !== 'undefined' ){
-                    chrome.tabs.query( queryOptions, function(tabs) {
-                         var newURL = currentURL + request.term;
-                         chrome.tabs.update( tabs[0].id, {
-                             url: newURL
-                         });
-                    });
+                    var newURL = currentURL + request.term;
+                    if( originTab ){
+                        chrome.tabs.update( originTab, {
+                            active: true,
+                            url: newURL
+                        });
+                    } else if( alternateWindow === false ){
+                        chrome.tabs.update( sender.tab.id, {
+                            active: true,
+                            url: newURL
+                        });
+                    } else {
+                        queryOptions.url = newURL;
+                        chrome.tabs.create( queryOptions );
+                    }
                 }
-                break;
 
+                break;
             case 'getRunState':
                 sendResponse({
                     runState: currentState
