@@ -1,31 +1,37 @@
 {
     "manifest_version": 2,
-
-    "name": "Image search extension",
+    "name": "Re-Search",
     "description": "This extension shows an alternative result when doing a Google or Bing image search.",
     "icons": {
         "16": "icons/icon16.png",
         "48": "icons/icon48.png",
         "128": "icons/icon128.png"
     },
-    "version": "1.0",
+    "version": "0.1.1",
     "browser_action": {
         "default_popup": "popup.html"
     },
-
     "content_scripts": [
         {
-            "matches": [ "http://*/*", "https://*/*" ],
-            "js": [ "content.js" ]
+            "matches": [
+                "http://*/*",
+                "https://*/*"
+            ],
+            "js": [
+                "content.js"
+            ]
         }
     ],
     "permissions": [
         "activeTab",
         "tabs",
-        "http://*/*", "https://*/*",
+        "http://*/*",
+        "https://*/*",
         "storage"
     ],
     "background": {
-        "scripts": [ "background.js" ]
+        "scripts": [
+            "background.js"
+        ]
     }
 }
