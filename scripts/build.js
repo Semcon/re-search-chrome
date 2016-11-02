@@ -20,11 +20,15 @@ const incrementVersion = function incrementVersion(){
     const packageData = JSON.parse( fs.readFileSync( packagePath, 'utf8' ) );
     const manifestData = JSON.parse( fs.readFileSync( manifestPath, 'utf8' ) );
 
-    packageData.version = semver.inc( packageData.version, argv[ 'type' ] );
+    const version = semver.inc( packageData.version, argv[ 'type' ] );
+
+    packageData.version = version;
     manifestData.version = semver.inc( manifestData.version, argv[ 'type' ] );
 
     fs.writeFileSync( packagePath, JSON.stringify( packageData, null, 4 ) );
     fs.writeFileSync( manifestPath, JSON.stringify( manifestData, null, 4 ) );
+
+    console.log( `Package updated to ${ version }.` );
 };
 
 const buildZip = function buildZip(){
@@ -32,8 +36,8 @@ const buildZip = function buildZip(){
     const archive = archiver.create( 'zip', {} );
 
     output.on( 'close', function() {
-        console.log( archive.pointer() + ' total bytes' );
         console.log( 'Archiver has been finalized and the output file descriptor has closed.' );
+        console.log( archive.pointer() + ' bytes written.' );
     });
 
     archive.on( 'error', function( error ) {
