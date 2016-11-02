@@ -161,6 +161,18 @@ function showWindows( request, newTerm, windowOriginId ){
                         url: originLink,
                         windowId: originWindow.id
                     } );
+
+                    chrome.tabs.query( {
+                        active: true,
+                        windowId: originWindow.id
+                    }, function(tabs) {
+
+                        if( doLog ){
+                            console.log('origin tab ID: ' , tabs[0].id);
+                        }
+
+                        originTab = tabs[0].id;
+                    });
                 }
             }
 
@@ -325,6 +337,18 @@ chrome.runtime.onMessage.addListener(
                     } else {
                         queryOptions.url = newURL;
                         chrome.tabs.create( queryOptions );
+
+                        chrome.tabs.query( {
+                            active: true,
+                            windowId: originWindow.id
+                        }, function(tabs) {
+
+                            if( doLog ){
+                                console.log('origin tab ID: ' , tabs[0].id);
+                            }
+
+                            originTab = tabs[0].id;
+                        });
                     }
                 }
 
