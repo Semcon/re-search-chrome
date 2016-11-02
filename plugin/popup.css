@@ -8,15 +8,6 @@ body * {
     box-sizing: border-box;
 }
 
-.popup-menu {
-    background-color: #fff;
-    border: 1px solid #555;
-    font-size: 200%;
-    padding: 5%;
-    text-align: center;
-    word-wrap: break-word;
-}
-
 svg {
     height: 110px;
     width: 110px;
@@ -24,6 +15,16 @@ svg {
 
 svg:hover {
     cursor: pointer;
+}
+
+.popup-menu {
+    background-color: #fff;
+    border: 1px solid #555;
+    border-bottom: 0px;
+    font-size: 200%;
+    padding: 5%;
+    text-align: center;
+    word-wrap: break-word;
 }
 
 .switchbtn-on path {
@@ -57,3 +58,8 @@ svg:hover {
     background-image:url(http://www.iconsdb.com/icons/download/icon-sets/grey-wall/facebook-6-64.png);
     background-repeat: no-repeat;
 }
+
+.site-link-wrapper {
+    border-bottom: 1px solid #555;
+}
+
