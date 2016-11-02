@@ -65,6 +65,10 @@ chrome.tabs.onRemoved.addListener( function( tabId ){
     if( tabId === originTab ){
         originTab = false;
     }
+
+    if( tabId === alternateTab){
+        alternateTab = false;
+    }
 });
 
 var xhr = new XMLHttpRequest();
@@ -160,10 +164,32 @@ function showWindows( request, newTerm, windowOriginId ){
                 }
             }
 
-            chrome.tabs.update( alternateTab, {
-                url: link,
-                active: true
-            });
+            if( alternateTab === false ){
+                chrome.tabs.create( {
+                    active: true,
+                    url: link,
+                    windowId: alternateWindow.id
+                } );
+
+                chrome.tabs.query( {
+                    active: true,
+                    windowId: alternateWindow.id
+                }, function(tabs) {
+
+                    if( doLog ){
+                        console.log('alternate tab ID: ' , tabs[0].id);
+                    }
+
+                    alternateTab = tabs[0].id;
+                });
+            }
+
+            else{
+                chrome.tabs.update( alternateTab, {
+                    url: link,
+                    active: true
+                });
+            }
         }
     } else {
         if( doLog ){
