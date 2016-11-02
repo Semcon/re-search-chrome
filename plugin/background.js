@@ -160,19 +160,15 @@ function showWindows( request, newTerm, windowOriginId ){
                         active: true,
                         url: originLink,
                         windowId: originWindow.id
-                    } );
-
-                    chrome.tabs.query( {
-                        active: true,
-                        windowId: originWindow.id
-                    }, function(tabs) {
+                    }, function (tab) {
 
                         if( doLog ){
-                            console.log('origin tab ID: ' , tabs[0].id);
+                            console.log('origin tab ID: ', tab.id);
                         }
 
-                        originTab = tabs[0].id;
-                    });
+                        originTab = tab.id;
+
+                    } );
                 }
             }
 
@@ -181,19 +177,15 @@ function showWindows( request, newTerm, windowOriginId ){
                     active: true,
                     url: link,
                     windowId: alternateWindow.id
-                } );
-
-                chrome.tabs.query( {
-                    active: true,
-                    windowId: alternateWindow.id
-                }, function(tabs) {
+                }, function (tab){
 
                     if( doLog ){
-                        console.log('alternate tab ID: ' , tabs[0].id);
+                        console.log('alternate tab ID: ', tab.id);
                     }
 
-                    alternateTab = tabs[0].id;
-                });
+                    alternateTab = tab.id;
+
+                } );
             }
 
             else{
@@ -336,19 +328,17 @@ chrome.runtime.onMessage.addListener(
                         });
                     } else {
                         queryOptions.url = newURL;
-                        chrome.tabs.create( queryOptions );
+                        chrome.tabs.create(
+                            queryOptions,
+                            function (tab){
 
-                        chrome.tabs.query( {
-                            active: true,
-                            windowId: originWindow.id
-                        }, function(tabs) {
+                                if( doLog ){
+                                    console.log('origin tab ID: ', tab.id);
+                                }
 
-                            if( doLog ){
-                                console.log('origin tab ID: ' , tabs[0].id);
-                            }
+                                originTab = tab.id;
 
-                            originTab = tabs[0].id;
-                        });
+                        } );
                     }
                 }
 
