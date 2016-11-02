@@ -63,3 +63,9 @@ svg:hover {
     border-bottom: 1px solid #555;
 }
 
+.disclaimer {
+    color: #ccc;
+    display: block;
+    font-size: 10px;
+    text-align: right;
+}
