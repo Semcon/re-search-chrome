@@ -391,7 +391,16 @@ chrome.runtime.onMessage.addListener(
                     }
                 );
                 break;
+            case 'addToolbar':
+                chrome.tabs.insertCSS( {
+                    file: '/toolbar/toolbar.css'
+                }, function(){
+                    chrome.tabs.executeScript( {
+                        file: '/toolbar/toolbar.js'
+                    });
+                });
 
+                break;
             default:
                 if( doLog ){
                     console.log( 'Message to event page was not handled: ', request );

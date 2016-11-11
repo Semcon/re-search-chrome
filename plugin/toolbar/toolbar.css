@@ -1,0 +1,129 @@
+.re-search-toolbar {
+    height: 60px;
+    left: 0;
+    overflow: hidden;
+    position: absolute;
+    right: 0;
+    z-index: 14000000;
+}
+
+.re-search-toolbar a,
+.re-search-toolbar a:link,
+.re-search-toolbar a:visited,
+.re-search-toolbar a:active {
+    border-bottom: 1px solid #73D791;
+    color: #000;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.re-search-toolbar a:hover {
+    color: #73D791;
+}
+
+.re-search-logo-wrapper {
+    background-color: #73D791;
+    display: inline-block;
+    height: 60px;
+    text-align: center;
+    width: 60px;
+}
+
+.re-search-logo-wrapper img {
+    margin-top: 10px;
+    width: 30px;
+}
+
+.re-search-select {
+    background: none;
+    border: 1px solid #73D791;
+    font-weight: 700;
+    height: 39px;
+    margin-left: 67px;
+    padding: 10px 20px;
+    position: relative;
+    top: -14px;
+}
+
+.re-search-select:hover {
+    cursor: pointer;
+}
+
+.re-search-tip-button {
+    background: none;
+    border: 1px solid #73D791;
+    font-weight: 700;
+    height: 39px;
+    margin-left: 5px;
+    padding: 10px 20px;
+    position: relative;
+    text-align: center;
+    top: -14px;
+}
+
+.re-search-tip-button:hover {
+    cursor: pointer;
+}
+
+.re-search-share-button {
+    float: right;
+    margin-right: 15px;
+    position: relative;
+    top: 20px;
+}
+
+.re-search-read-more-button {
+    float: right;
+    margin-right: 15px;
+    position: relative;
+    top: 20px;
+}
+
+.re-search-on-off-toggle {
+    background-color: #73D791;
+    float: right;
+    margin-right: 15px;
+    padding: 5px 0;
+    position: relative;
+    top: 15px;
+}
+
+.re-search-on-off-toggle.active .re-search-on-off-paddle {
+    left: 1px;
+}
+
+.re-search-on-off-paddle {
+    background-color: #fff;
+    bottom: 1px;
+    left: 28px;
+    position: absolute;
+    top: 1px;
+    transition: all 0.3s ease;
+    width: calc( 50% - 1px );
+}
+
+a.re-search-on-off-text {
+    border: 0;
+    padding: 5px;
+    position: relative;
+    z-index: 1;
+}
+
+a.re-search-on-off-text:hover {
+    color: #000;
+    cursor: pointer;
+}
+
+a.re-search-hide-button {
+    color: #73D791;
+    border: 0;
+    float: right;
+    font-size: 50px;
+    font-weight: 100;
+    margin-right: 15px;
+}
+
+a.re-search-hide-button:hover {
+    border: 0;
+    cursor: pointer;
+}
