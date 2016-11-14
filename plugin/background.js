@@ -1,19 +1,23 @@
 var currentState = '';
+var showBar = '';
+
 var currentTerms;
 var currentURL;
 var jsonData;
 var doLog = false;
 var alternateWindow = false;
-var alternateTab = false;
+var alternateTabId = false;
 var originWindow = false;
-var originTab = false;
+var originTabId = false;
 
 var DATA_URL = 'https://api.myjson.com/bins/1rq4a';
 
 //First time running script to check what value runState is in chrome storage.
 //If runState is undefined it is gets set to enabled otherwise it gets the value.
-chrome.storage.sync.get( 'runState', function(data) {
+chrome.storage.sync.get( [ 'runState', 'showBar' ], function(data) {
+    console.log( data );
     currentState = data.runState;
+    showBar = data.showBar;
 
     if( doLog ){
         console.log( 'val: ', currentState );
@@ -26,6 +30,17 @@ chrome.storage.sync.get( 'runState', function(data) {
         }, function () {
             if( doLog ){
                 console.log( 'Saved', 'runState', currentState );
+            }
+        });
+    }
+
+    if( typeof showBar === 'undefined' ){
+        showBar = true;
+        chrome.storage.sync.set( {
+            showBar: showBar
+        }, function () {
+            if( doLog ){
+                console.log( 'Saved', 'showBar', showBar );
             }
         });
     }
@@ -62,12 +77,12 @@ chrome.windows.onRemoved.addListener( function( windowId ){
 } );
 
 chrome.tabs.onRemoved.addListener( function( tabId ){
-    if( tabId === originTab ){
-        originTab = false;
+    if( tabId === originTabId ){
+        originTabId = false;
     }
 
-    if( tabId === alternateTab){
-        alternateTab = false;
+    if( tabId === alternateTabId){
+        alternateTabId = false;
     }
 });
 
@@ -80,15 +95,15 @@ xhr.onreadystatechange = function() {
 }
 xhr.send();
 
-function showWindows( request, newTerm, windowOriginId ){
+function showWindows( term, newTerm, windowOriginId ){
 
     if( doLog ){
-        console.log( request.term );
+        console.log( term );
     }
 
     if( typeof currentURL !== 'undefined' ){
         var link = currentURL + newTerm;
-        var originLink = currentURL + request.term;
+        var originLink = currentURL + term;
 
         if( doLog ){
             console.log( 'Link: ' , link );
@@ -110,7 +125,7 @@ function showWindows( request, newTerm, windowOriginId ){
                         console.log('origin tab ID: ' , tabs[0].id);
                     }
 
-                    originTab = tabs[0].id;
+                    originTabId = tabs[0].id;
                 });
 
                 chrome.windows.create( {
@@ -133,7 +148,7 @@ function showWindows( request, newTerm, windowOriginId ){
                             console.log('alternate tab ID: ' , tabs[0].id);
                         }
 
-                        alternateTab = tabs[0].id;
+                        alternateTabId = tabs[0].id;
                     });
                 });
 
@@ -149,8 +164,8 @@ function showWindows( request, newTerm, windowOriginId ){
             }
 
             if( windowOriginId === alternateWindow.id ){
-                if( originTab ){
-                    chrome.tabs.update( originTab, {
+                if( originTabId ){
+                    chrome.tabs.update( originTabId, {
                         active: true,
                         url: originLink
                     });
@@ -165,13 +180,13 @@ function showWindows( request, newTerm, windowOriginId ){
                             console.log('origin tab ID: ', tab.id);
                         }
 
-                        originTab = tab.id;
+                        originTabId = tab.id;
 
                     } );
                 }
             }
 
-            if( alternateTab === false ){
+            if( alternateTabId === false ){
                 chrome.tabs.create( {
                     active: true,
                     url: link,
@@ -182,13 +197,13 @@ function showWindows( request, newTerm, windowOriginId ){
                         console.log('alternate tab ID: ', tab.id);
                     }
 
-                    alternateTab = tab.id;
+                    alternateTabId = tab.id;
 
                 } );
             }
 
             else{
-                chrome.tabs.update( alternateTab, {
+                chrome.tabs.update( alternateTabId, {
                     url: link,
                     active: true
                 });
@@ -201,111 +216,166 @@ function showWindows( request, newTerm, windowOriginId ){
     }
 }
 
-function getEngineInformation( request, sender, sendResponse ){
-    //content script is asking for selector
-    var url = request.url;
-    var currentEngine;
+function showToolbar(){
+    if( !showBar && !currentURL ){
+        return false;
+    }
 
-    // Loop over all engines
-    if( typeof jsonData !== 'undefined' && typeof url !== 'undefined' ){
-        for( var i = 0; i < jsonData.engines.length; i = i + 1 ){
-            var matchCount = 0;
+    console.log( originTabId, alternateTabId );
 
-            // Loop over all required matches for the engine
-            for( var matchIndex = 0; matchIndex < jsonData.engines[ i ].match.length; matchIndex = matchIndex + 1 ){
-                if( url.indexOf( jsonData.engines[ i ].match[ matchIndex ] ) > -1 ){
-                    // We have a match, increment our counter
-                    matchCount = matchCount + 1;
-                    if( doLog ){
-                        console.log('found match, matchCount: ', matchCount);
-                    }
-                }
+    if( originTabId ){
+        chrome.tabs.insertCSS( originTabId, {
+            file: '/toolbar/toolbar.css'
+        }, function(){
+            chrome.tabs.executeScript( originTabId, {
+                file: '/toolbar/toolbar.js'
+            });
+        });
+    }
+
+    if( alternateTabId ){
+        chrome.tabs.insertCSS( alternateTabId, {
+            file: '/toolbar/toolbar.css'
+        }, function(){
+            chrome.tabs.executeScript( alternateTabId, {
+                file: '/toolbar/toolbar.js'
+            });
+        });
+    }
+}
+
+function hasBetterTerm( term ){
+    var lowercaseTerms;
+
+    if( typeof currentTerms === 'undefined' ){
+        return false;
+    }
+
+    if( doLog ){
+        console.log( 'received term: ', term );
+        console.log( 'currentTerms: ', currentTerms );
+        console.log( 'Using term: ', term.toLowerCase() );
+    }
+
+    term = term.toLowerCase();
+
+    if( doLog ){
+        console.log('currentTerms is defined');
+    }
+
+    for(var i = 0; i < currentTerms.length; i++ ){
+        lowercaseTerms = Object.keys( currentTerms[ i ] ).map( function( string ){
+            return string.toLowerCase();
+        });
+
+        if( lowercaseTerms.indexOf( term ) > -1 ){
+            if( doLog ){
+                console.log( 'term is found', term );
             }
 
-            // If we have the same number of matches as required matches we have a valid site
-            if( matchCount === jsonData.engines[ i ].match.length ){
+            return currentTerms[ i ][ Object.keys( currentTerms[ i ] )[ lowercaseTerms.indexOf( term ) ] ];
+        }
+    }
+
+    return false;
+}
+
+function isValidEngine( url ){
+    if( typeof jsonData === 'undefined' ) {
+        return false;
+    }
+
+    if( typeof url === 'undefined' ){
+        return false;
+    }
+
+    console.log( url );
+
+    for( var i = 0; i < jsonData.engines.length; i = i + 1 ){
+        var matchCount = 0;
+
+        // Loop over all required matches for the engine
+        for( var matchIndex = 0; matchIndex < jsonData.engines[ i ].match.length; matchIndex = matchIndex + 1 ){
+            if( url.indexOf( jsonData.engines[ i ].match[ matchIndex ] ) > -1 ){
+                // We have a match, increment our counter
+                matchCount = matchCount + 1;
                 if( doLog ){
-                    console.log( 'Valid site' );
+                    console.log('found match, matchCount: ', matchCount);
                 }
-
-                currentEngine = jsonData.engines[ i ];
-                currentTerms = [];
-                for(var key in jsonData.terms[currentEngine.terms]){
-                    currentTerms.push( jsonData.terms[ currentEngine.terms ][ key ] );
-                }
-
-                currentURL = currentEngine.url;
-
-                sendResponse({
-                    selectorSearchField: currentEngine.selectors.input,
-                    englishTerms: jsonData.terms[currentEngine.terms].eng
-                });
-
-                return true;
             }
         }
 
+        // If we have the same number of matches as required matches we have a valid site
+        if( matchCount === jsonData.engines[ i ].match.length ){
+            return jsonData.engines[ i ];
+        }
+    }
+
+    return false;
+}
+
+function getEngineInformation( request, sender, sendResponse ){
+    var currentEngine = isValidEngine( request.url );
+
+    console.log( currentEngine );
+
+    // Loop over all engines
+    if( !currentEngine ){
         if( doLog ){
-            console.log( 'If not valid site, Url:', url );
+            console.log( 'If not valid site, Url:', request.url );
         }
 
         sendResponse({
             selectorSearchField: false
         });
+
+        return false;
     }
+
+    if( doLog ){
+        console.log( 'Valid site' );
+    }
+
+    currentTerms = [];
+    for ( var key in jsonData.terms[ currentEngine.terms ] ){
+        currentTerms.push( jsonData.terms[ currentEngine.terms ][ key ] );
+    }
+
+    currentURL = currentEngine.url;
+    englishTerms = jsonData.terms[ currentEngine.terms ].eng;
+
+    showToolbar();
+
+    sendResponse({
+        selectorSearchField: currentEngine.selectors.input
+    });
+
+    return true;
 }
 
 chrome.runtime.onMessage.addListener(
     function( request, sender, sendResponse ) {
         var queryOptions = {};
+        var betterTerm = false;
 
-        switch(request.action){
-
+        switch( request.action ){
             case 'getEngineInformation':
                 getEngineInformation( request, sender, sendResponse );
-                break;
 
+                break;
+            case 'getEnglishTerms':
+                sendResponse({
+                    englishTerms: englishTerms
+                });
+
+                break;
             case 'searchForTerm':
-                var termStatus = 'term not found';
-                var lowercaseTerms;
+                betterTerm = hasBetterTerm( request.term );
+                if( betterTerm ){
+                    showWindows( request.term, betterTerm, sender.tab.windowId );
+                };
 
-                if( doLog ){
-                    console.log('received term: ', request.term);
-                    console.log('currentTerms: ', currentTerms);
-                    console.log( 'Using term: ', request.term.toLowerCase() );
-                }
-
-                request.term = request.term.toLowerCase();
-
-                if(typeof currentTerms !== 'undefined'){
-                    if( doLog ){
-                        console.log('currentTerms is defined');
-                    }
-
-                    for(var i = 0; i < currentTerms.length; i++ ){
-                        lowercaseTerms = Object.keys( currentTerms[ i ] ).map( function( string ){
-                            return string.toLowerCase();
-                        });
-
-                        if( lowercaseTerms.indexOf( request.term ) > -1 ){
-                            if( doLog ){
-                                console.log('term is found', request);
-                            }
-
-                            termStatus = 'term was found';
-
-                            showWindows( request, currentTerms[ i ][ Object.keys( currentTerms[ i ] )[ lowercaseTerms.indexOf( request.term ) ] ], sender.tab.windowId );
-
-                            break;
-                        }
-                    }
-
-                    sendResponse({
-                        status: termStatus
-                    });
-                }
                 break;
-
             case 'updateTabURL':
                 queryOptions.active = true;
 
@@ -315,8 +385,8 @@ chrome.runtime.onMessage.addListener(
 
                 if( typeof currentURL !== 'undefined' ){
                     var newURL = currentURL + request.term;
-                    if( originTab ){
-                        chrome.tabs.update( originTab, {
+                    if( originTabId ){
+                        chrome.tabs.update( originTabId, {
                             active: true,
                             url: newURL
                         });
@@ -335,19 +405,13 @@ chrome.runtime.onMessage.addListener(
                                     console.log('origin tab ID: ', tab.id);
                                 }
 
-                                originTab = tab.id;
+                                originTabId = tab.id;
 
                         } );
                     }
                 }
 
                 break;
-            case 'getRunState':
-                sendResponse({
-                    runState: currentState
-                });
-                break;
-
             case 'changeRunState':
                 if( doLog ){
                     console.log( 'ChangeRunState from popup / current value is: ', currentState );
@@ -390,15 +454,24 @@ chrome.runtime.onMessage.addListener(
                         });
                     }
                 );
+
                 break;
             case 'addToolbar':
-                chrome.tabs.insertCSS( {
-                    file: '/toolbar/toolbar.css'
-                }, function(){
-                    chrome.tabs.executeScript( {
-                        file: '/toolbar/toolbar.js'
-                    });
-                });
+                showToolbar();
+
+                break;
+            case 'enableToolbar':
+                showBar = true;
+
+                chrome.storage.sync.set({ showBar: showBar },
+                    function () {
+                        if( doLog ){
+                            console.log( 'Saved', 'showBar', showBar );
+                        }
+
+                        showToolbar();
+                    }
+                );
 
                 break;
             default:

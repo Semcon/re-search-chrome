@@ -32,6 +32,7 @@
     function getToolbar(){
         var toolbar = document.createElement( 'div' );
         toolbar.className = 're-search-toolbar';
+        toolbar.id = 're-search-toolbar';
 
         var logoWrapper = document.createElement( 'div' );
         logoWrapper.className = 're-search-logo-wrapper';
@@ -95,7 +96,31 @@
         return toolbar;
     }
 
+    function addListeners(){
+        window.addEventListener( 'click', function( event ){
+            if( event.target.className === 're-search-on-off-text' ){
+                document.querySelector( '.re-search-on-off-toggle' ).classList.toggle( 'active' );
+            }
+        });
+
+        window.addEventListener( 'change', function(event){
+            if( event.target.id === 'termList' ){
+                console.log('in get element from drop down');
+                var term = document.getElementById( 'termList' ).value;
+
+                chrome.runtime.sendMessage({
+                    action: 'updateTabURL',
+                    term: term
+                });
+            }
+        });
+    }
+
     function injectToolbar(){
+        if( document.getElementById( 're-search-toolbar' ) ){
+            return false;
+        }
+
         var toolbar = getToolbar();
         var body = document.querySelectorAll( 'body' )[ 0 ];
         var currentStyle;
@@ -113,24 +138,14 @@
             body.children[ i ].setAttribute( 'style', newStyle );
         }
 
+        addListeners();
         body.insertBefore( toolbar, body.children[ 0 ] );
     }
 
-    function init(){
-        chrome.runtime.sendMessage({
-            action: 'getEngineInformation',
-            url: window.location.href
-        }, function(response) {
-            englishTerms = response.englishTerms;
-            injectToolbar();
-        });
-    }
-
-    window.addEventListener( 'click', function( event ){
-        if( event.target.className === 're-search-on-off-text' ){
-            document.querySelector( '.re-search-on-off-toggle' ).classList.toggle( 'active' );
-        }
+    chrome.runtime.sendMessage({
+        action: 'getEnglishTerms'
+    }, function( response ) {
+        englishTerms = response.englishTerms;
+        injectToolbar();
     });
-
-    init();
 })()
