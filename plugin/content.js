@@ -41,18 +41,18 @@
             return false;
         }
 
+        listenersAdded = true;
+
         setInterval( getTitle, 64 );
 
         window.addEventListener( 'term', function(){
             getSearchTerm();
         });
-
-        listenersAdded = true;
     }
 
     //Gets search terms when different events occur.
     function getSearchTerm(){
-        elements = document.querySelectorAll(inputSelector);
+        elements = document.querySelectorAll( inputSelector );
         if( elements.length === 0 ){
             setTimeout( getSearchTerm, 100 );
 
