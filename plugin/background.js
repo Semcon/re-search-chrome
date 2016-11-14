@@ -4,7 +4,6 @@ var showBar = '';
 var currentTerms;
 var currentURL;
 var jsonData;
-var doLog = false;
 var alternateWindow = false;
 var alternateTabId = false;
 var originWindow = false;
@@ -15,33 +14,21 @@ var DATA_URL = 'https://api.myjson.com/bins/1rq4a';
 //First time running script to check what value runState is in chrome storage.
 //If runState is undefined it is gets set to enabled otherwise it gets the value.
 chrome.storage.sync.get( [ 'runState', 'showBar' ], function(data) {
-    console.log( data );
     currentState = data.runState;
     showBar = data.showBar;
 
-    if( doLog ){
-        console.log( 'val: ', currentState );
-    }
-
     if( typeof currentState === 'undefined' ){
         currentState = 'enabled';
-        chrome.storage.sync.set( {
+
+        chrome.storage.sync.set({
             runState: currentState
-        }, function () {
-            if( doLog ){
-                console.log( 'Saved', 'runState', currentState );
-            }
         });
     }
 
     if( typeof showBar === 'undefined' ){
         showBar = true;
-        chrome.storage.sync.set( {
+        chrome.storage.sync.set({
             showBar: showBar
-        }, function () {
-            if( doLog ){
-                console.log( 'Saved', 'showBar', showBar );
-            }
         });
     }
 
@@ -49,10 +36,6 @@ chrome.storage.sync.get( [ 'runState', 'showBar' ], function(data) {
 });
 
 chrome.windows.onRemoved.addListener( function( windowId ){
-    if( doLog ){
-        console.log( 'Window removed', windowId );
-    }
-
     if( windowId === alternateWindow.id ){
         chrome.windows.update( originWindow.id, {
             left: originWindow.left,
@@ -96,35 +79,18 @@ xhr.onreadystatechange = function() {
 xhr.send();
 
 function showWindows( term, newTerm, windowOriginId ){
-
-    if( doLog ){
-        console.log( term );
-    }
-
     if( typeof currentURL !== 'undefined' ){
         var link = currentURL + newTerm;
         var originLink = currentURL + term;
 
-        if( doLog ){
-            console.log( 'Link: ' , link );
-        }
-
         if( alternateWindow === false ){
             chrome.windows.getCurrent( {}, function( window ){
-                if( doLog ){
-                    console.log( window );
-                }
-
                 originWindow = window;
 
                 chrome.tabs.query( {
                     active: true,
                     windowId: originWindow.id
                 }, function(tabs) {
-                    if( doLog ){
-                        console.log('origin tab ID: ' , tabs[0].id);
-                    }
-
                     originTabId = tabs[0].id;
                 });
 
@@ -143,11 +109,6 @@ function showWindows( term, newTerm, windowOriginId ){
                         active: true,
                         windowId: alternateWindow.id
                     }, function(tabs) {
-
-                        if( doLog ){
-                            console.log('alternate tab ID: ' , tabs[0].id);
-                        }
-
                         alternateTabId = tabs[0].id;
                     });
                 });
@@ -159,10 +120,6 @@ function showWindows( term, newTerm, windowOriginId ){
                 });
             });
         } else {
-            if( doLog ){
-                console.log( 'Should update alternate window' );
-            }
-
             if( windowOriginId === alternateWindow.id ){
                 if( originTabId ){
                     chrome.tabs.update( originTabId, {
@@ -175,13 +132,7 @@ function showWindows( term, newTerm, windowOriginId ){
                         url: originLink,
                         windowId: originWindow.id
                     }, function (tab) {
-
-                        if( doLog ){
-                            console.log('origin tab ID: ', tab.id);
-                        }
-
                         originTabId = tab.id;
-
                     } );
                 }
             }
@@ -192,26 +143,15 @@ function showWindows( term, newTerm, windowOriginId ){
                     url: link,
                     windowId: alternateWindow.id
                 }, function (tab){
-
-                    if( doLog ){
-                        console.log('alternate tab ID: ', tab.id);
-                    }
-
                     alternateTabId = tab.id;
 
                 } );
-            }
-
-            else{
+            } else {
                 chrome.tabs.update( alternateTabId, {
                     url: link,
                     active: true
                 });
             }
-        }
-    } else {
-        if( doLog ){
-            console.log( 'currentURL and/or currentTerms is undefined' );
         }
     }
 }
@@ -249,17 +189,7 @@ function hasBetterTerm( term ){
         return false;
     }
 
-    if( doLog ){
-        console.log( 'received term: ', term );
-        console.log( 'currentTerms: ', currentTerms );
-        console.log( 'Using term: ', term.toLowerCase() );
-    }
-
     term = term.toLowerCase();
-
-    if( doLog ){
-        console.log('currentTerms is defined');
-    }
 
     for(var i = 0; i < currentTerms.length; i++ ){
         lowercaseTerms = Object.keys( currentTerms[ i ] ).map( function( string ){
@@ -267,10 +197,6 @@ function hasBetterTerm( term ){
         });
 
         if( lowercaseTerms.indexOf( term ) > -1 ){
-            if( doLog ){
-                console.log( 'term is found', term );
-            }
-
             return currentTerms[ i ][ Object.keys( currentTerms[ i ] )[ lowercaseTerms.indexOf( term ) ] ];
         }
     }
@@ -295,9 +221,6 @@ function getEngine( url ){
             if( url.indexOf( jsonData.engines[ i ].match[ matchIndex ] ) > -1 ){
                 // We have a match, increment our counter
                 matchCount = matchCount + 1;
-                if( doLog ){
-                    console.log('found match, matchCount: ', matchCount);
-                }
             }
         }
 
@@ -314,19 +237,11 @@ function getEngineInformation( request, sender, sendResponse ){
     var currentEngine = getEngine( request.url );
 
     if( !currentEngine ){
-        if( doLog ){
-            console.log( 'Invalid site', request.url );
-        }
-
         sendResponse({
             selectorSearchField: false
         });
 
         return false;
-    }
-
-    if( doLog ){
-        console.log( 'Valid site' );
     }
 
     currentTerms = [];
@@ -364,6 +279,7 @@ chrome.runtime.onMessage.addListener(
                 break;
             case 'searchForTerm':
                 betterTerm = hasBetterTerm( request.term );
+
                 if( betterTerm ){
                     showWindows( request.term, betterTerm, sender.tab.windowId );
                 };
@@ -392,24 +308,15 @@ chrome.runtime.onMessage.addListener(
                         queryOptions.url = newURL;
                         chrome.tabs.create(
                             queryOptions,
-                            function (tab){
-
-                                if( doLog ){
-                                    console.log('origin tab ID: ', tab.id);
-                                }
-
+                            function ( tab ) {
                                 originTabId = tab.id;
-
-                        } );
+                            }
+                        );
                     }
                 }
 
                 break;
             case 'changeRunState':
-                if( doLog ){
-                    console.log( 'ChangeRunState from popup / current value is: ', currentState );
-                }
-
                 if( currentState === 'enabled'){
                     currentState = 'disabled';
                 } else {
@@ -418,9 +325,6 @@ chrome.runtime.onMessage.addListener(
 
                 chrome.storage.sync.set({ runState: currentState },
                     function () {
-                        if( doLog ){
-                            console.log( 'Saved', 'runState', currentState );
-                        }
 
                         chrome.tabs.query({
                             active: true,
@@ -458,9 +362,6 @@ chrome.runtime.onMessage.addListener(
 
                 chrome.storage.sync.set({ showBar: showBar },
                     function () {
-                        if( doLog ){
-                            console.log( 'Saved', 'showBar', showBar );
-                        }
 
                         showToolbar();
                     }
@@ -468,9 +369,6 @@ chrome.runtime.onMessage.addListener(
 
                 break;
             default:
-                if( doLog ){
-                    console.log( 'Message to event page was not handled: ', request );
-                }
         }
 
         return true;
