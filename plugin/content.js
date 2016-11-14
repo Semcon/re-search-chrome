@@ -5,8 +5,8 @@
     var listenersAdded = false;
     var lastSentTerm = false;
 
-    function sendText( text ){
-        if( typeof text === 'undefined' ){
+    function sendTerm( term ){
+        if( typeof term === 'undefined' ){
             return false;
         }
 
@@ -17,8 +17,8 @@
         lastSentTerm = term;
 
         chrome.runtime.sendMessage({
-            action: "searchForTerm",
-            term: text
+            action: 'searchForTerm',
+            term: term
         });
     }
 
