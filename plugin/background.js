@@ -180,6 +180,16 @@ function showToolbar(){
             });
         });
     }
+
+    if( !originTabId && !alternateTabId ){
+        chrome.tabs.insertCSS({
+            file: '/toolbar/toolbar.css'
+        }, function(){
+            chrome.tabs.executeScript({
+                file: '/toolbar/toolbar.js'
+            });
+        });
+    }
 }
 
 function hasBetterTerm( term ){
