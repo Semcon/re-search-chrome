@@ -114,6 +114,14 @@
                 });
             }
         });
+
+        window.addEventListener( 'click', function( event ){
+            if( event.target.className === 're-search-hide-button' ){
+                chrome.runtime.sendMessage({
+        			action: 'disableToolbar'
+        		});
+            }
+        });
     }
 
     function injectToolbar(){
@@ -142,10 +150,39 @@
         body.insertBefore( toolbar, body.children[ 0 ] );
     }
 
+    function removeToolbar(){
+        var body = document.querySelectorAll( 'body' )[ 0 ];
+        var toolbar = document.getElementById( 're-search-toolbar' );
+
+        for( var i = 0; i < body.children.length; i = i + 1 ){
+            currentStyle = body.children[ i ].getAttribute( 'style' );
+
+            if( !currentStyle ){
+                newStyle = 'transform: translateY( 0px );';
+            } else {
+                newStyle = currentStyle + '; transform: translateY( 0px );';
+            }
+
+            body.children[ i ].setAttribute( 'style', newStyle );
+        }
+
+        if( toolbar ){
+            toolbar.remove();
+        }
+    }
+
     chrome.runtime.sendMessage({
-        action: 'getEnglishTerms'
-    }, function( response ) {
-        englishTerms = response.englishTerms;
-        injectToolbar();
+        action: 'getToolbarStatus'
+    }, function( response ){
+        if( response.showBar ){
+            chrome.runtime.sendMessage({
+                action: 'getEnglishTerms'
+            }, function( response ) {
+                englishTerms = response.englishTerms;
+                injectToolbar();
+            });
+        } else {
+            removeToolbar();
+        }
     });
 })()
