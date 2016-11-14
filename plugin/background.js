@@ -221,8 +221,6 @@ function showToolbar(){
         return false;
     }
 
-    console.log( originTabId, alternateTabId );
-
     if( originTabId ){
         chrome.tabs.insertCSS( originTabId, {
             file: '/toolbar/toolbar.css'
@@ -280,7 +278,7 @@ function hasBetterTerm( term ){
     return false;
 }
 
-function isValidEngine( url ){
+function getEngine( url ){
     if( typeof jsonData === 'undefined' ) {
         return false;
     }
@@ -288,8 +286,6 @@ function isValidEngine( url ){
     if( typeof url === 'undefined' ){
         return false;
     }
-
-    console.log( url );
 
     for( var i = 0; i < jsonData.engines.length; i = i + 1 ){
         var matchCount = 0;
@@ -315,14 +311,11 @@ function isValidEngine( url ){
 }
 
 function getEngineInformation( request, sender, sendResponse ){
-    var currentEngine = isValidEngine( request.url );
+    var currentEngine = getEngine( request.url );
 
-    console.log( currentEngine );
-
-    // Loop over all engines
     if( !currentEngine ){
         if( doLog ){
-            console.log( 'If not valid site, Url:', request.url );
+            console.log( 'Invalid site', request.url );
         }
 
         sendResponse({
