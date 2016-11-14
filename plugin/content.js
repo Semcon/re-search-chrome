@@ -3,12 +3,18 @@
     var inputSelector;
     var titleTerm = false;
     var listenersAdded = false;
+    var lastSentTerm = false;
 
     function sendText( text ){
         if( typeof text === 'undefined' ){
             return false;
         }
 
+        if( lastSentTerm === term ){
+            return false;
+        }
+
+        lastSentTerm = term;
 
         chrome.runtime.sendMessage({
             action: "searchForTerm",
