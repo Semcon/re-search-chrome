@@ -96,10 +96,30 @@
         return toolbar;
     }
 
+    function setDisabledState(){
+        document.querySelector( '.re-search-on-off-toggle' ).classList.remove( 'active' );
+        document.querySelector( '.re-search-select' ).setAttribute( 'disabled', 'disabled' );
+        document.querySelector( '.re-search-tip-button' ).setAttribute( 'disabled', 'disabled' );
+    }
+
+    function setEnabledState(){
+        document.querySelector( '.re-search-on-off-toggle' ).classList.add( 'active' );
+        document.querySelector( '.re-search-select' ).removeAttribute( 'disabled' );
+        document.querySelector( '.re-search-tip-button' ).removeAttribute( 'disabled' );
+    }
+
     function addListeners(){
         window.addEventListener( 'click', function( event ){
             if( event.target.className === 're-search-on-off-text' ){
-                document.querySelector( '.re-search-on-off-toggle' ).classList.toggle( 'active' );
+                if( document.querySelector( '.re-search-on-off-toggle' ).classList.contains( 'active' ) ){
+                    chrome.runtime.sendMessage({
+                        action: 'disablePopups'
+                    });
+                } else {
+                    chrome.runtime.sendMessage({
+                        action: 'enablePopups'
+                    });
+                }
             }
         });
 
@@ -120,6 +140,14 @@
                 chrome.runtime.sendMessage({
         			action: 'disableToolbar'
         		});
+            }
+        });
+
+        chrome.runtime.onMessage.addListener( function( request, sender, sendResponse ) {
+            if( request.runState ){
+                setEnabledState();
+            } else {
+                setDisabledState();
             }
         });
     }
@@ -148,6 +176,16 @@
 
         addListeners();
         body.insertBefore( toolbar, body.children[ 0 ] );
+
+        chrome.runtime.sendMessage({
+            action: 'getRunState'
+        }, function( response ) {
+            if( request.runState ){
+                setEnabledState();
+            } else {
+                setDisabledState();
+            }
+        });
     }
 
     function removeToolbar(){

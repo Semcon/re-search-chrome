@@ -1,5 +1,5 @@
-var currentState = '';
-var showBar = '';
+var showPopups = true;
+var showBar = true;
 
 var currentTerms;
 var currentURL;
@@ -14,14 +14,14 @@ var DATA_URL = 'https://api.myjson.com/bins/1rq4a';
 //First time running script to check what value runState is in chrome storage.
 //If runState is undefined it is gets set to enabled otherwise it gets the value.
 chrome.storage.sync.get( [ 'runState', 'showBar' ], function(data) {
-    currentState = data.runState;
+    showPopups = data.runState;
     showBar = data.showBar;
 
-    if( typeof currentState === 'undefined' ){
-        currentState = 'enabled';
+    if( typeof showPopups === 'undefined' ){
+        showPopups = true;
 
         chrome.storage.sync.set({
-            runState: currentState
+            runState: showPopups
         });
     }
 
@@ -79,85 +79,91 @@ xhr.onreadystatechange = function() {
 xhr.send();
 
 function showWindows( term, newTerm, windowOriginId ){
-    if( typeof currentURL !== 'undefined' ){
-        var link = currentURL + newTerm;
-        var originLink = currentURL + term;
+    if( typeof currentURL === 'undefined' ){
+        return false;
+    }
 
-        if( alternateWindow === false ){
-            chrome.windows.getCurrent( {}, function( window ){
-                originWindow = window;
+    if( !showPopups ){
+        return false;
+    }
+
+    var link = currentURL + newTerm;
+    var originLink = currentURL + term;
+
+    if( alternateWindow === false ){
+        chrome.windows.getCurrent( {}, function( window ){
+            originWindow = window;
+
+            chrome.tabs.query( {
+                active: true,
+                windowId: originWindow.id
+            }, function(tabs) {
+                originTabId = tabs[0].id;
+            });
+
+            chrome.windows.create( {
+                height: parseInt( window.height, 10 ),
+                left: parseInt( window.left + ( window.width / 2 ), 10 ),
+                state: 'normal',
+                top: parseInt( window.top, 10 ) ,
+                type: 'normal',
+                url: link,
+                width: parseInt( window.width / 2, 10 )
+            }, function( createdWindowData ) {
+                alternateWindow = createdWindowData;
 
                 chrome.tabs.query( {
                     active: true,
-                    windowId: originWindow.id
+                    windowId: alternateWindow.id
                 }, function(tabs) {
-                    originTabId = tabs[0].id;
-                });
-
-                chrome.windows.create( {
-                    height: parseInt( window.height, 10 ),
-                    left: parseInt( window.left + ( window.width / 2 ), 10 ),
-                    state: 'normal',
-                    top: parseInt( window.top, 10 ) ,
-                    type: 'normal',
-                    url: link,
-                    width: parseInt( window.width / 2, 10 )
-                }, function( createdWindowData ) {
-                    alternateWindow = createdWindowData;
-
-                    chrome.tabs.query( {
-                        active: true,
-                        windowId: alternateWindow.id
-                    }, function(tabs) {
-                        alternateTabId = tabs[0].id;
-                    });
-                });
-
-                chrome.windows.update( window.id, {
-                    left: parseInt( window.left, 10 ),
-                    top: parseInt( window.top, 10 ),
-                    width: parseInt( window.width / 2, 10 )
+                    alternateTabId = tabs[0].id;
                 });
             });
-        } else {
-            if( windowOriginId === alternateWindow.id ){
-                if( originTabId ){
-                    chrome.tabs.update( originTabId, {
-                        active: true,
-                        url: originLink
-                    });
-                } else {
-                    chrome.tabs.create( {
-                        active: true,
-                        url: originLink,
-                        windowId: originWindow.id
-                    }, function (tab) {
-                        originTabId = tab.id;
-                    } );
-                }
-            }
 
-            if( alternateTabId === false ){
+            chrome.windows.update( window.id, {
+                left: parseInt( window.left, 10 ),
+                top: parseInt( window.top, 10 ),
+                width: parseInt( window.width / 2, 10 )
+            });
+        });
+    } else {
+        if( windowOriginId === alternateWindow.id ){
+            if( originTabId ){
+                chrome.tabs.update( originTabId, {
+                    active: true,
+                    url: originLink
+                });
+            } else {
                 chrome.tabs.create( {
                     active: true,
-                    url: link,
-                    windowId: alternateWindow.id
-                }, function (tab){
-                    alternateTabId = tab.id;
-
+                    url: originLink,
+                    windowId: originWindow.id
+                }, function (tab) {
+                    originTabId = tab.id;
                 } );
-            } else {
-                chrome.tabs.update( alternateTabId, {
-                    url: link,
-                    active: true
-                });
             }
+        }
+
+        if( alternateTabId === false ){
+            chrome.tabs.create( {
+                active: true,
+                url: link,
+                windowId: alternateWindow.id
+            }, function (tab){
+                alternateTabId = tab.id;
+
+            } );
+        } else {
+            chrome.tabs.update( alternateTabId, {
+                url: link,
+                active: true
+            });
         }
     }
 }
 
-function showToolbar(){
-    if( !showBar && !currentURL ){
+function runToolbarScript(){
+    if( !currentURL ){
         return false;
     }
 
@@ -262,7 +268,7 @@ function getEngineInformation( request, sender, sendResponse ){
     currentURL = currentEngine.url;
     englishTerms = jsonData.terms[ currentEngine.terms ].eng;
 
-    showToolbar();
+    runToolbarScript();
 
     sendResponse({
         selectorSearchField: currentEngine.selectors.input
@@ -326,45 +332,56 @@ chrome.runtime.onMessage.addListener(
                 }
 
                 break;
-            case 'changeRunState':
-                if( currentState === 'enabled'){
-                    currentState = 'disabled';
-                } else {
-                    currentState = 'enabled';
+            case 'getRunState':
+                chrome.tabs.sendMessage( sender.tab.id, {
+                    runState: showPopups
+                });
+
+                break;
+            case 'disablePopups':
+                showPopups = false;
+
+                chrome.storage.sync.set({ runState: showPopups });
+
+                chrome.tabs.sendMessage( originTabId, {
+                    action: 'stateChanged',
+                    runState: showPopups
+                } );
+
+                chrome.tabs.sendMessage( alternateTabId, {
+                    action: 'stateChanged',
+                    runState: showPopups
+                } );
+
+                break;
+            case 'enablePopups':
+                showPopups = true;
+
+                chrome.storage.sync.set({ runState: showPopups });
+
+                if( originTabId ){
+                    chrome.tabs.sendMessage( originTabId, {
+                        action: 'stateChanged',
+                        runState: showPopups
+                    } );
                 }
 
-                chrome.storage.sync.set({ runState: currentState },
-                    function () {
-
-                        chrome.tabs.query({
-                            active: true,
-                            currentWindow: true
-                        }, function( tabs ) {
-                            chrome.tabs.sendMessage( tabs[0].id, {
-                                action: 'changeRunState',
-                                runState: currentState
-                            }, function( response ) {
-                                if( response ){
-                                    if( doLog ){
-                                        console.log( response.message );
-                                    }
-                                } else {
-                                    if( doLog ){
-                                        console.log('Content script not injected');
-                                    }
-                                }
-                            });
-                        });
-
-                        sendResponse({
-                            runState: currentState
-                        });
-                    }
-                );
+                if( alternateTabId ){
+                    chrome.tabs.sendMessage( alternateTabId, {
+                        action: 'stateChanged',
+                        runState: showPopups
+                    } );
+                }
 
                 break;
             case 'addToolbar':
-                showToolbar();
+                runToolbarScript();
+
+                break;
+            case 'getToolbarStatus':
+                sendResponse({
+                    showBar: showBar
+                });
 
                 break;
             case 'enableToolbar':
@@ -372,13 +389,23 @@ chrome.runtime.onMessage.addListener(
 
                 chrome.storage.sync.set({ showBar: showBar },
                     function () {
+                        runToolbarScript();
+                    }
+                );
 
-                        showToolbar();
+                break;
+            case 'disableToolbar':
+                showBar = false;
+
+                chrome.storage.sync.set({ showBar: showBar },
+                    function () {
+                        runToolbarScript();
                     }
                 );
 
                 break;
             default:
+                console.log( 'Message to event page was not handled: ', request );
         }
 
         return true;

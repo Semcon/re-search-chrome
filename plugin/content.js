@@ -50,7 +50,6 @@
         });
     }
 
-    //Gets search terms when different events occur.
     function getSearchTerm(){
         elements = document.querySelectorAll( inputSelector );
         if( elements.length === 0 ){
