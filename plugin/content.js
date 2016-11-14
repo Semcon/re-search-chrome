@@ -71,7 +71,7 @@
             return false;
         }
 
-        titleTerm = document.getElementsByTagName( 'title' )[ 0 ].innerText;
+        titleTerm = document.getElementsByTagName( 'title' )[ 0 ].textContent;
         addListeners();
         getSearchTerm();
     }
