@@ -360,15 +360,26 @@ chrome.runtime.onMessage.addListener(
 
                 chrome.storage.sync.set({ runState: showPopups });
 
-                chrome.tabs.sendMessage( originTabId, {
-                    action: 'stateChanged',
-                    runState: showPopups
-                } );
+                if( originTabId ){
+                    chrome.tabs.sendMessage( originTabId, {
+                        action: 'stateChanged',
+                        runState: showPopups
+                    } );
+                }
 
-                chrome.tabs.sendMessage( alternateTabId, {
-                    action: 'stateChanged',
-                    runState: showPopups
-                } );
+                if( alternateTabId ){
+                    chrome.tabs.sendMessage( alternateTabId, {
+                        action: 'stateChanged',
+                        runState: showPopups
+                    } );
+                }
+
+                if( sender.tab.id !== originTabId && sender.tab.id !== alternateTabId ){
+                    chrome.tabs.sendMessage( sender.tab.id, {
+                        action: 'stateChanged',
+                        runState: showPopups
+                    } );
+                }
 
                 break;
             case 'enablePopups':
@@ -385,6 +396,13 @@ chrome.runtime.onMessage.addListener(
 
                 if( alternateTabId ){
                     chrome.tabs.sendMessage( alternateTabId, {
+                        action: 'stateChanged',
+                        runState: showPopups
+                    } );
+                }
+
+                if( sender.tab.id !== originTabId && sender.tab.id !== alternateTabId ){
+                    chrome.tabs.sendMessage( sender.tab.id, {
                         action: 'stateChanged',
                         runState: showPopups
                     } );
