@@ -76,8 +76,7 @@
     }
 
     chrome.runtime.sendMessage({
-        action: 'getEngineInformation',
-        url: window.location.href
+        action: 'getEngineInformation'
     }, function( response ) {
         if( response.selectorSearchField !== false ){
             inputSelector = response.selectorSearchField;

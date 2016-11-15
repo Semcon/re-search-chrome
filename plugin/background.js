@@ -273,8 +273,8 @@ function isValidUrl( url ){
     return true;
 }
 
-function getEngineInformation( request, sender, sendResponse ){
-    var currentEngine = getEngine( request.url );
+function getEngineInformation( sender, sendResponse ){
+    var currentEngine = getEngine( sender.url );
 
     if( !currentEngine ){
         sendResponse({
@@ -308,7 +308,7 @@ chrome.runtime.onMessage.addListener(
 
         switch( request.action ){
             case 'getEngineInformation':
-                getEngineInformation( request, sender, sendResponse );
+                getEngineInformation( sender, sendResponse );
 
                 break;
             case 'getEnglishTerms':
