@@ -326,7 +326,7 @@
         chrome.runtime.sendMessage({
             action: 'getRunState'
         }, function( response ) {
-            if( request.runState ){
+            if( response && response.runState ){
                 setEnabledState();
             } else {
                 setDisabledState();
