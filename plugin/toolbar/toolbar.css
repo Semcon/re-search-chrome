@@ -103,7 +103,13 @@
 }
 
 .re-search-tip-term {
+    display: inline-block;
     font-weight: 700;
+    max-width: 100px;
+    overflow: hidden;
+    position: relative;
+    text-overflow: ellipsis;
+    top: 3px;
 }
 
 .re-search-share-wrapper {
