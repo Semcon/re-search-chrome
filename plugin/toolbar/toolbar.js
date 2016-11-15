@@ -1,8 +1,7 @@
 (function(){
     var tipUrl = 'http://example.com';
-    var englishTerms;
 
-    function getSelectList(){
+    function getSelectList( englishTerms ){
         //Create and append select list
         var terms = Object.keys( englishTerms );
 
@@ -97,14 +96,18 @@
 
         toolbar.appendChild( logoWrapper );
 
-        var selectList = getSelectList();
-        toolbar.appendChild( selectList );
-
         var tipButton = document.createElement( 'button' );
         tipButton.className = 're-search-button re-search-tip-button';
         tipButton.innerText = 'Add to Re-Search';
 
         toolbar.appendChild( tipButton );
+
+        chrome.runtime.sendMessage({
+            action: 'getEnglishTerms'
+        }, function( response ) {
+            var selectList = getSelectList( response.englishTerms );
+            toolbar.insertBefore( selectList, tipButton );
+        });
 
         var approvedTipText = document.createElement( 'div' );
         approvedTipText.className = 're-search-approved-tip-text re-search-hidden';
@@ -357,10 +360,11 @@
     }, function( response ){
         if( response.showBar ){
             chrome.runtime.sendMessage({
-                action: 'getEnglishTerms'
-            }, function( response ) {
-                englishTerms = response.englishTerms;
-                injectToolbar();
+                action: 'isValidUrl'
+            }, function( response ){
+                if( response.valid ){
+                    injectToolbar();
+                }
             });
         } else {
             removeToolbar();

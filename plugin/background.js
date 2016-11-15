@@ -265,6 +265,14 @@ function getEngine( url ){
     return false;
 }
 
+function isValidUrl( url ){
+    if( !getEngine( url ) ){
+        return false;
+    }
+
+    return true;
+}
+
 function getEngineInformation( request, sender, sendResponse ){
     var currentEngine = getEngine( request.url );
 
@@ -307,6 +315,18 @@ chrome.runtime.onMessage.addListener(
                 sendResponse({
                     englishTerms: englishTerms
                 });
+
+                break;
+            case 'isValidUrl':
+                if( isValidUrl( sender.url ) ){
+                    sendResponse({
+                        valid: true
+                    });
+                } else {
+                    sendResponse({
+                        valid: false
+                    });
+                }
 
                 break;
             case 'searchForTerm':
