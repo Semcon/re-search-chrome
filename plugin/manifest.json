@@ -1,6 +1,8 @@
 {
     "manifest_version": 2,
-    "web_accessible_resources": ["icon-white.png"],
+    "web_accessible_resources": [
+        "icons/*"
+    ],
     "name": "Re-Search",
     "description": "This extension shows an alternative result when doing a Google or Bing image search.",
     "icons": {

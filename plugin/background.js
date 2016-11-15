@@ -1,6 +1,8 @@
 var showPopups = true;
 var showBar = true;
 
+var latestTerm = false;
+
 var currentTerms;
 var currentURL;
 var jsonData;
@@ -10,6 +12,7 @@ var originWindow = false;
 var originTabId = false;
 
 var DATA_URL = 'https://api.myjson.com/bins/1rq4a';
+var TIP_URL = 'http://example.com';
 
 //First time running script to check what value runState is in chrome storage.
 //If runState is undefined it is gets set to enabled otherwise it gets the value.
@@ -77,6 +80,19 @@ xhr.onreadystatechange = function() {
     }
 }
 xhr.send();
+
+function sendTip(){
+    var xhr = new XMLHttpRequest();
+    xhr.open( 'POST', TIP_URL, true );
+    xhr.setRequestHeader( 'Content-Type', 'application/x-www-form-urlencoded' );
+    xhr.onreadystatechange = function() {
+        if ( xhr.readyState === 4 && xhr.status === 200 ) {
+            console.log( 'Tip sent' );
+        }
+    }
+
+    xhr.send( 'term=' + latestTerm );
+}
 
 function showWindows( term, newTerm, windowOriginId ){
     if( typeof currentURL === 'undefined' ){
@@ -294,6 +310,7 @@ chrome.runtime.onMessage.addListener(
 
                 break;
             case 'searchForTerm':
+                latestTerm = request.term;
                 betterTerm = hasBetterTerm( request.term );
 
                 if( betterTerm ){
@@ -372,6 +389,16 @@ chrome.runtime.onMessage.addListener(
                         runState: showPopups
                     } );
                 }
+
+                break;
+            case 'getLatestTerm':
+                sendResponse({
+                    latestTerm: latestTerm
+                });
+
+                break;
+            case 'sendTip':
+                sendTip();
 
                 break;
             case 'addToolbar':
