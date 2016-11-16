@@ -199,6 +199,11 @@
         document.querySelector( '.re-search-deny-tip-button' ).classList.add( 're-search-hidden' );
 
         document.querySelector( '.re-search-approved-tip-text' ).classList.remove( 're-search-hidden' );
+        document.querySelector( '.re-search-select' ).classList.remove( 're-search-hidden' );
+        document.querySelector( '.re-search-share-wrapper' ).classList.remove( 're-search-hidden' );
+        document.querySelector( '.re-search-read-more-button' ).classList.remove( 're-search-hidden' );
+        document.querySelector( '.re-search-on-off-toggle' ).classList.remove( 're-search-hidden' );
+        document.querySelector( '.re-search-hide-button' ).classList.remove( 're-search-hidden' );
 
         chrome.runtime.sendMessage({
             action: 'sendTip'
@@ -215,6 +220,11 @@
 
     function hideTip(){
         document.querySelector( '.re-search-tip-button' ).classList.remove( 're-search-hidden' );
+        document.querySelector( '.re-search-select' ).classList.remove( 're-search-hidden' );
+        document.querySelector( '.re-search-share-wrapper' ).classList.remove( 're-search-hidden' );
+        document.querySelector( '.re-search-read-more-button' ).classList.remove( 're-search-hidden' );
+        document.querySelector( '.re-search-on-off-toggle' ).classList.remove( 're-search-hidden' );
+        document.querySelector( '.re-search-hide-button' ).classList.remove( 're-search-hidden' );
 
         document.querySelector( '.re-search-tip-text' ).classList.add( 're-search-hidden' );
         document.querySelector( '.re-search-approve-tip-button' ).classList.add( 're-search-hidden' );
@@ -223,6 +233,12 @@
 
     function showTip(){
         document.querySelector( '.re-search-tip-button' ).classList.add( 're-search-hidden' );
+        document.querySelector( '.re-search-select' ).classList.add( 're-search-hidden' );
+        document.querySelector( '.re-search-share-wrapper' ).classList.add( 're-search-hidden' );
+        document.querySelector( '.re-search-read-more-button' ).classList.add( 're-search-hidden' );
+        document.querySelector( '.re-search-on-off-toggle' ).classList.add( 're-search-hidden' );
+        document.querySelector( '.re-search-hide-button' ).classList.add( 're-search-hidden' );
+
         chrome.runtime.sendMessage({
             action: 'getLatestTerm'
         }, function( response ){

@@ -106,7 +106,7 @@
 .re-search-tip-term {
     display: inline-block;
     font-weight: 700;
-    max-width: 100px;
+    max-width: 260px;
     overflow: hidden;
     position: relative;
     text-overflow: ellipsis;
