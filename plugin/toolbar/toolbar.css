@@ -151,30 +151,40 @@ a:link.re-search-share-linkedin {
 }
 
 .re-search-on-off-toggle {
-    background-color: #73D791;
+    background-color: #ccc;
     float: right;
     margin-right: 15px;
     padding: 5px 0;
     position: relative;
+    transition: background-color 0.3s ease;
     top: 15px;
 }
 
+.re-search-on-off-toggle.active {
+    background-color: #73D791;
+}
+
 .re-search-on-off-toggle.active .re-search-on-off-paddle {
-    left: 1px;
+    left: 29px;
 }
 
 .re-search-on-off-paddle {
     background-color: #fff;
-    bottom: 1px;
-    left: 27px;
+    bottom: 2px;
+    left: 2px;
     position: absolute;
-    top: 1px;
+    top: 2px;
     transition: all 0.3s ease;
-    width: calc( 50% - 1px );
+    width: calc( 50% - 4px );
+    z-index: 2;
+}
+
+.re-search-on-off-paddle:hover {
+    cursor: pointer;
 }
 
 a.re-search-on-off-text {
-    border: 0;
+    border: 0 !important;
     padding: 5px;
     position: relative;
     z-index: 1;
@@ -183,6 +193,13 @@ a.re-search-on-off-text {
 a.re-search-on-off-text:hover {
     color: #000;
     cursor: pointer;
+}
+
+a.re-search-on-text,
+a:link.re-search-on-text,
+a:active.re-search-on-text,
+a:hover.re-search-on-text {
+    color: #fff !important;
 }
 
 a.re-search-hide-button {
