@@ -140,7 +140,12 @@
 
         var hideButton = document.createElement( 'a' );
         hideButton.className = 're-search-hide-button';
-        hideButton.innerText = 'X';
+
+        var hideImage = document.createElement( 'img' );
+        hideImage.setAttribute( 'src', chrome.extension.getURL( 'icons/icon-close.png' ) );
+        hideImage.className = 're-search-hide-icon';
+
+        hideButton.appendChild( hideImage );
 
         toolbar.appendChild( hideButton );
 
@@ -257,7 +262,7 @@
         });
 
         window.addEventListener( 'click', function( event ){
-            if( event.target.classList.contains( 're-search-hide-button' ) ){
+            if( event.target.classList.contains( 're-search-hide-button' ) || event.target.classList.contains( 're-search-hide-icon' ) ){
                 chrome.runtime.sendMessage({
         			action: 'disableToolbar'
         		});

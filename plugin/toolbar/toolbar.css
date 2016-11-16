@@ -75,6 +75,7 @@
     padding: 10px 20px;
     position: relative;
     top: -14px;
+    width: 183px;
 }
 
 .re-search-select:hover {
@@ -165,7 +166,7 @@ a:link.re-search-share-linkedin {
 .re-search-on-off-paddle {
     background-color: #fff;
     bottom: 1px;
-    left: 28px;
+    left: 27px;
     position: absolute;
     top: 1px;
     transition: all 0.3s ease;
@@ -185,15 +186,22 @@ a.re-search-on-off-text:hover {
 }
 
 a.re-search-hide-button {
-    color: #73D791;
     border: 0;
+    color: #73D791;
     float: right;
     font-size: 50px;
     font-weight: 100;
     margin-right: 15px;
+    position: relative;
+    top: -3px;
 }
 
 a.re-search-hide-button:hover {
     border: 0;
     cursor: pointer;
+}
+
+.re-search-hide-button img {
+    height: 32px;
+    width: 32px;
 }
