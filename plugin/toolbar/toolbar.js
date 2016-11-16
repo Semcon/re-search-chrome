@@ -267,7 +267,6 @@
 
         window.addEventListener( 'change', function(event){
             if( event.target.id === 'termList' ){
-                console.log('in get element from drop down');
                 var term = document.getElementById( 'termList' ).value;
 
                 chrome.runtime.sendMessage({
