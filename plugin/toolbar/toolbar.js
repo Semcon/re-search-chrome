@@ -1,10 +1,7 @@
 (function(){
     var tipUrl = 'http://example.com';
 
-    function getSelectList( englishTerms ){
-        //Create and append select list
-        var terms = Object.keys( englishTerms );
-
+    function getSelectList( terms ){
         var selectList = document.createElement( 'select');
         selectList.className = 're-search-select';
         selectList.id = "termList";
@@ -103,9 +100,9 @@
         toolbar.appendChild( tipButton );
 
         chrome.runtime.sendMessage({
-            action: 'getEnglishTerms'
+            action: 'getDropdownTerms'
         }, function( response ) {
-            var selectList = getSelectList( response.englishTerms );
+            var selectList = getSelectList( response.dropdownTerms );
             toolbar.insertBefore( selectList, tipButton );
         });
 

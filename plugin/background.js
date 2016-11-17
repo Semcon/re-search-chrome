@@ -11,7 +11,7 @@ var alternateTabId = false;
 var originWindow = false;
 var originTabId = false;
 
-var DATA_URL = 'https://api.myjson.com/bins/1rq4a';
+var DATA_URL = 'https://api.myjson.com/bins/1bv2i';
 var TIP_URL = 'http://example.com';
 
 //First time running script to check what value runState is in chrome storage.
@@ -223,14 +223,14 @@ function hasBetterTerm( term ){
 
     term = term.toLowerCase();
 
-    for(var i = 0; i < currentTerms.length; i++ ){
-        lowercaseTerms = Object.keys( currentTerms[ i ] ).map( function( string ){
-            return string.toLowerCase();
-        });
+    console.log( term );
 
-        if( lowercaseTerms.indexOf( term ) > -1 ){
-            return currentTerms[ i ][ Object.keys( currentTerms[ i ] )[ lowercaseTerms.indexOf( term ) ] ];
-        }
+    lowercaseTerms = Object.keys( currentTerms ).map( function( string ){
+        return string.toLowerCase();
+    });
+
+    if( lowercaseTerms.indexOf( term ) > -1 ){
+        return currentTerms[ Object.keys( currentTerms )[ lowercaseTerms.indexOf( term ) ] ];
     }
 
     return false;
@@ -285,12 +285,16 @@ function getEngineInformation( sender, sendResponse ){
     }
 
     currentTerms = [];
+    dropdownTerms = [];
     for ( var key in jsonData.terms[ currentEngine.terms ] ){
-        currentTerms.push( jsonData.terms[ currentEngine.terms ][ key ] );
+        currentTerms[ key ] = jsonData.terms[ currentEngine.terms ][ key ].updated;
+
+        if( jsonData.terms[ currentEngine.terms ][ key ].dropdown ){
+            dropdownTerms.push( key );
+        }
     }
 
     currentURL = currentEngine.url;
-    englishTerms = jsonData.terms[ currentEngine.terms ].eng;
 
     runToolbarScript();
 
@@ -311,9 +315,9 @@ chrome.runtime.onMessage.addListener(
                 getEngineInformation( sender, sendResponse );
 
                 break;
-            case 'getEnglishTerms':
+            case 'getDropdownTerms':
                 sendResponse({
-                    englishTerms: englishTerms
+                    dropdownTerms: dropdownTerms
                 });
 
                 break;
