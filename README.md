@@ -8,7 +8,7 @@ show a very inaccurate result regarding the divions of male and female people pr
 With this plugin you will be presented with an alternate search that together with
 the original search better represents the real world demographic.
 
-We've decided to publish this early because we belive this project can benefit from being
+We've decided to publish this early because we believe this project can benefit from being
 available in the public realm.
 
 ## Disclaimer
