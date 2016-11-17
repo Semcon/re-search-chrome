@@ -24,4 +24,25 @@
             }
         }
     } );
+
+    chrome.runtime.sendMessage({
+        action: 'getToolbarStatus'
+    }, function( response ){
+        if( response.showBar ){
+            document.querySelector( '.re-search-yes-no-toggle' ).classList.add( 'enabled' );
+        }
+    });
+
+    chrome.runtime.onMessage.addListener( function( request, sender, sendResponse ){
+        switch( request.action ){
+            case 'enableToolbar':
+                document.querySelector( '.re-search-yes-no-toggle' ).classList.add( 'enabled' );
+
+                break;
+            case 'disableToolbar':
+                document.querySelector( '.re-search-yes-no-toggle' ).classList.remove( 'enabled' );
+
+                break;
+        }
+    });
 })();
