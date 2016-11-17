@@ -14,8 +14,8 @@ var originTabId = false;
 var DATA_URL = 'https://api.myjson.com/bins/1bv2i';
 var TIP_URL = 'http://example.com';
 
-//First time running script to check what value runState is in chrome storage.
-//If runState is undefined it is gets set to enabled otherwise it gets the value.
+//First time running script to check what value showBar is in chrome storage.
+//If showBar is undefined it is gets set to enabled otherwise it gets the value.
 chrome.storage.sync.get( [ 'showBar' ], function(data) {
     showBar = data.showBar;
 
@@ -269,7 +269,7 @@ function getEngineInformation( sender, sendResponse ){
         return false;
     }
 
-    currentTerms = [];
+    currentTerms = {};
     dropdownTerms = [];
     for ( var key in jsonData.terms[ currentEngine.terms ] ){
         currentTerms[ key ] = jsonData.terms[ currentEngine.terms ][ key ].updated;
