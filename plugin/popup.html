@@ -39,6 +39,57 @@
 			display: block;
 			margin: 4px 0;
 		}
+
+		.re-search-yes-no-toggle {
+			margin-top: 5px;
+		    background-color: #ccc;
+		    display: inline-block;
+		    padding: 5px 0;
+		    position: relative;
+		    transition: background-color 0.3s ease;
+		}
+
+		.re-search-yes-no-toggle.enabled {
+		    background-color: #73D791;
+		}
+
+		.re-search-yes-no-toggle.enabled .re-search-yes-no-paddle {
+		    left: 28px;
+		}
+
+		.re-search-yes-no-paddle {
+		    background-color: #fff;
+		    bottom: 2px;
+		    left: 2px;
+		    position: absolute;
+		    top: 2px;
+		    transition: all 0.3s ease;
+		    width: calc( 50% - 2px );
+		    z-index: 2;
+		}
+
+		.re-search-yes-no-paddle:hover {
+		    cursor: pointer;
+		}
+
+		.re-search-yes-no-text {
+		    border: 0;
+		    padding: 5px;
+		    position: relative;
+		    z-index: 1;
+		}
+
+		.re-search-yes-no-text,
+		.re-search-yes-no-text:hover {
+		    color: #000;
+		    cursor: pointer;
+			text-decoration: none;
+		}
+
+		.re-search-yes-text,
+		.re-search-yes-text:hover {
+		    color: #fff;
+		}
 	</style>
 </head>
 <body>
@@ -69,6 +120,19 @@
 			target="_blank"
 		>
 			Read more about Re-Search
+		</a>
+	</div>
+	<h3>
+		Settings
+	</h3>
+	Show toolbar on image-search pages
+	<div class="re-search-yes-no-toggle">
+		<span class="re-search-yes-no-paddle"></span>
+		<a href="#" class="re-search-yes-no-text re-search-yes-text">
+			Yes
+		</a>
+		<a href="#" class="re-search-yes-no-text re-search-no-text">
+			No
 		</a>
 	</div>
 	<script src="popup.js"></script>

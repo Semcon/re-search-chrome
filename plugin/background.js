@@ -1,4 +1,3 @@
-var showPopups = true;
 var showBar = true;
 
 var latestTerm = false;
@@ -17,17 +16,8 @@ var TIP_URL = 'http://example.com';
 
 //First time running script to check what value runState is in chrome storage.
 //If runState is undefined it is gets set to enabled otherwise it gets the value.
-chrome.storage.sync.get( [ 'runState', 'showBar' ], function(data) {
-    showPopups = data.runState;
+chrome.storage.sync.get( [ 'showBar' ], function(data) {
     showBar = data.showBar;
-
-    if( typeof showPopups === 'undefined' ){
-        showPopups = true;
-
-        chrome.storage.sync.set({
-            runState: showPopups
-        });
-    }
 
     if( typeof showBar === 'undefined' ){
         showBar = true;
@@ -97,10 +87,6 @@ function sendTip(){
 
 function showWindows( term, newTerm, windowOriginId ){
     if( typeof currentURL === 'undefined' ){
-        return false;
-    }
-
-    if( !showPopups ){
         return false;
     }
 
@@ -369,66 +355,6 @@ chrome.runtime.onMessage.addListener(
                             }
                         );
                     }
-                }
-
-                break;
-            case 'getRunState':
-                chrome.tabs.sendMessage( sender.tab.id, {
-                    runState: showPopups
-                });
-
-                break;
-            case 'disablePopups':
-                showPopups = false;
-
-                chrome.storage.sync.set({ runState: showPopups });
-
-                if( originTabId ){
-                    chrome.tabs.sendMessage( originTabId, {
-                        action: 'stateChanged',
-                        runState: showPopups
-                    } );
-                }
-
-                if( alternateTabId ){
-                    chrome.tabs.sendMessage( alternateTabId, {
-                        action: 'stateChanged',
-                        runState: showPopups
-                    } );
-                }
-
-                if( sender.tab.id !== originTabId && sender.tab.id !== alternateTabId ){
-                    chrome.tabs.sendMessage( sender.tab.id, {
-                        action: 'stateChanged',
-                        runState: showPopups
-                    } );
-                }
-
-                break;
-            case 'enablePopups':
-                showPopups = true;
-
-                chrome.storage.sync.set({ runState: showPopups });
-
-                if( originTabId ){
-                    chrome.tabs.sendMessage( originTabId, {
-                        action: 'stateChanged',
-                        runState: showPopups
-                    } );
-                }
-
-                if( alternateTabId ){
-                    chrome.tabs.sendMessage( alternateTabId, {
-                        action: 'stateChanged',
-                        runState: showPopups
-                    } );
-                }
-
-                if( sender.tab.id !== originTabId && sender.tab.id !== alternateTabId ){
-                    chrome.tabs.sendMessage( sender.tab.id, {
-                        action: 'stateChanged',
-                        runState: showPopups
-                    } );
                 }
 
                 break;

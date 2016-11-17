@@ -146,26 +146,6 @@
 
         toolbar.appendChild( hideButton );
 
-        var onOffToggle = document.createElement( 'div' );
-        onOffToggle.className = 're-search-on-off-toggle';
-
-        var onOffPaddle = document.createElement( 'div' );
-        onOffPaddle.className = 're-search-on-off-paddle';
-
-        var onText = document.createElement( 'a' );
-        onText.className = 're-search-on-off-text re-search-on-text';
-        onText.innerText = 'On';
-
-        var offText = document.createElement( 'a' );
-        offText.className = 're-search-on-off-text re-search-off-text';
-        offText.innerText = 'Off';
-
-        onOffToggle.appendChild( onOffPaddle );
-        onOffToggle.appendChild( onText );
-        onOffToggle.appendChild( offText );
-
-        toolbar.appendChild( onOffToggle );
-
         var readMoreButton = document.createElement( 'a' );
         readMoreButton.className = 're-search-read-more-button';
         readMoreButton.innerText = 'Read more';
@@ -178,18 +158,6 @@
         return toolbar;
     }
 
-    function setDisabledState(){
-        document.querySelector( '.re-search-on-off-toggle' ).classList.remove( 'active' );
-        document.querySelector( '.re-search-select' ).setAttribute( 'disabled', 'disabled' );
-        document.querySelector( '.re-search-tip-button' ).setAttribute( 'disabled', 'disabled' );
-    }
-
-    function setEnabledState(){
-        document.querySelector( '.re-search-on-off-toggle' ).classList.add( 'active' );
-        document.querySelector( '.re-search-select' ).removeAttribute( 'disabled' );
-        document.querySelector( '.re-search-tip-button' ).removeAttribute( 'disabled' );
-    }
-
     function approveTip(){
         document.querySelector( '.re-search-tip-text' ).classList.add( 're-search-hidden' );
         document.querySelector( '.re-search-approve-tip-button' ).classList.add( 're-search-hidden' );
@@ -199,7 +167,6 @@
         document.querySelector( '.re-search-select' ).classList.remove( 're-search-hidden' );
         document.querySelector( '.re-search-share-wrapper' ).classList.remove( 're-search-hidden' );
         document.querySelector( '.re-search-read-more-button' ).classList.remove( 're-search-hidden' );
-        document.querySelector( '.re-search-on-off-toggle' ).classList.remove( 're-search-hidden' );
         document.querySelector( '.re-search-hide-button' ).classList.remove( 're-search-hidden' );
 
         chrome.runtime.sendMessage({
@@ -220,7 +187,6 @@
         document.querySelector( '.re-search-select' ).classList.remove( 're-search-hidden' );
         document.querySelector( '.re-search-share-wrapper' ).classList.remove( 're-search-hidden' );
         document.querySelector( '.re-search-read-more-button' ).classList.remove( 're-search-hidden' );
-        document.querySelector( '.re-search-on-off-toggle' ).classList.remove( 're-search-hidden' );
         document.querySelector( '.re-search-hide-button' ).classList.remove( 're-search-hidden' );
 
         document.querySelector( '.re-search-tip-text' ).classList.add( 're-search-hidden' );
@@ -233,7 +199,6 @@
         document.querySelector( '.re-search-select' ).classList.add( 're-search-hidden' );
         document.querySelector( '.re-search-share-wrapper' ).classList.add( 're-search-hidden' );
         document.querySelector( '.re-search-read-more-button' ).classList.add( 're-search-hidden' );
-        document.querySelector( '.re-search-on-off-toggle' ).classList.add( 're-search-hidden' );
         document.querySelector( '.re-search-hide-button' ).classList.add( 're-search-hidden' );
 
         chrome.runtime.sendMessage({
@@ -248,20 +213,6 @@
     }
 
     function addListeners(){
-        window.addEventListener( 'click', function( event ){
-            if( event.target.classList.contains( 're-search-on-off-text' ) || event.target.classList.contains( 're-search-on-off-paddle' ) ){
-                if( document.querySelector( '.re-search-on-off-toggle' ).classList.contains( 'active' ) ){
-                    chrome.runtime.sendMessage({
-                        action: 'disablePopups'
-                    });
-                } else {
-                    chrome.runtime.sendMessage({
-                        action: 'enablePopups'
-                    });
-                }
-            }
-        });
-
         window.addEventListener( 'change', function(event){
             if( event.target.id === 'termList' ){
                 var term = document.getElementById( 'termList' ).value;
@@ -305,14 +256,6 @@
                 showShareButtons();
             }
         });
-
-        chrome.runtime.onMessage.addListener( function( request, sender, sendResponse ) {
-            if( request.runState ){
-                setEnabledState();
-            } else {
-                setDisabledState();
-            }
-        });
     }
 
     function injectToolbar(){
@@ -339,16 +282,6 @@
 
         addListeners();
         body.insertBefore( toolbar, body.children[ 0 ] );
-
-        chrome.runtime.sendMessage({
-            action: 'getRunState'
-        }, function( response ) {
-            if( response && response.runState ){
-                setEnabledState();
-            } else {
-                setDisabledState();
-            }
-        });
     }
 
     function removeToolbar(){
