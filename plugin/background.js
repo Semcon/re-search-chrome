@@ -223,8 +223,6 @@ function hasBetterTerm( term ){
 
     term = term.toLowerCase();
 
-    console.log( term );
-
     lowercaseTerms = Object.keys( currentTerms ).map( function( string ){
         return string.toLowerCase();
     });
