@@ -2,6 +2,7 @@ var showPopups = true;
 var showBar = true;
 
 var latestTerm = false;
+var dropdownTerms = [];
 
 var currentTerms;
 var currentURL;
