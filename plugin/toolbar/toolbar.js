@@ -106,6 +106,11 @@
             toolbar.insertBefore( selectList, tipButton );
         });
 
+        var selectArrow = document.createElement( 'div' );
+        selectArrow.className = 're-search-arrow-down';
+
+        toolbar.appendChild( selectArrow );
+
         var approvedTipText = document.createElement( 'div' );
         approvedTipText.className = 're-search-approved-tip-text re-search-hidden';
         approvedTipText.innerText = 'Thumbs up! We\'ll look into that.';
@@ -168,6 +173,7 @@
         document.querySelector( '.re-search-share-wrapper' ).classList.remove( 're-search-hidden' );
         document.querySelector( '.re-search-read-more-button' ).classList.remove( 're-search-hidden' );
         document.querySelector( '.re-search-hide-button' ).classList.remove( 're-search-hidden' );
+        document.querySelector( '.re-search-arrow-down' ).classList.remove( 're-search-hidden' );
 
         chrome.runtime.sendMessage({
             action: 'sendTip'
@@ -188,6 +194,7 @@
         document.querySelector( '.re-search-share-wrapper' ).classList.remove( 're-search-hidden' );
         document.querySelector( '.re-search-read-more-button' ).classList.remove( 're-search-hidden' );
         document.querySelector( '.re-search-hide-button' ).classList.remove( 're-search-hidden' );
+        document.querySelector( '.re-search-arrow-down' ).classList.remove( 're-search-hidden' );
 
         document.querySelector( '.re-search-tip-text' ).classList.add( 're-search-hidden' );
         document.querySelector( '.re-search-approve-tip-button' ).classList.add( 're-search-hidden' );
@@ -200,6 +207,7 @@
         document.querySelector( '.re-search-share-wrapper' ).classList.add( 're-search-hidden' );
         document.querySelector( '.re-search-read-more-button' ).classList.add( 're-search-hidden' );
         document.querySelector( '.re-search-hide-button' ).classList.add( 're-search-hidden' );
+        document.querySelector( '.re-search-arrow-down' ).classList.add( 're-search-hidden' );
 
         chrome.runtime.sendMessage({
             action: 'getLatestTerm'

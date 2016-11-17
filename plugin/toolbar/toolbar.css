@@ -67,7 +67,11 @@
 }
 
 .re-search-select {
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
     background: none;
+    border-radius: 0;
     border: 1px solid #73D791;
     font-weight: 700;
     height: 39px;
@@ -78,8 +82,41 @@
     width: 183px;
 }
 
+.re-search-select:focus {
+    background-color: #73D791;
+}
+
 .re-search-select:hover {
     cursor: pointer;
+}
+
+.re-search-select option {
+    background-color: #fff;
+}
+
+.re-search-arrow-down {
+    border-left: 11px solid transparent;
+    border-right: 11px solid transparent;
+    border-top: 11px solid green;
+    height: 0;
+    left: 280px;
+    pointer-events: none;
+    position: absolute;
+    top: 24px;
+    width: 0;
+}
+
+.re-search-arrow-down:after {
+    border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+    border-top: 9px solid #fff;
+    content: ' ';
+    height: 0;
+    left: -9px;
+    pointer-events: none;
+    position: absolute;
+    top: -10px;
+    width: 0;
 }
 
 .re-search-tip-button {
