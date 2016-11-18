@@ -1,4 +1,5 @@
 .re-search-hidden {
+    display: none;
     opacity: 0;
     pointer-events: none;
     z-index: -1;
@@ -207,4 +208,29 @@ a.re-search-hide-button:hover {
 .re-search-hide-button img {
     height: 32px;
     width: 32px;
+}
+
+@media screen and ( max-width: 890px ){
+    .re-search-read-more-button {
+        display: none;
+    }
+
+    .re-search-share-wrapper {
+        right: 70px;
+    }
+}
+
+@media screen and ( max-width: 670px ){
+    .re-search-tip-button,
+    .re-search-tip-text,
+    .re-search-approve-tip-button,
+    .re-search-deny-tip-button {
+        display: none;
+    }
+}
+
+@media screen and ( max-width: 540px ){
+    .re-search-share-wrapper {
+        display: none;
+    }
 }
