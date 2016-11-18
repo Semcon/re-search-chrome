@@ -30,24 +30,27 @@ chrome.storage.sync.get( [ 'showBar' ], function(data) {
 });
 
 chrome.windows.onRemoved.addListener( function( windowId ){
+    var updateProperties = {
+        focused: originWindow.focused
+    };
+
+    if( originWindow.state === 'minimized' || originWindow.state === 'maximized' || originWindow.state === 'fullscreen' ){
+        updateProperties.state = originWindow.state;
+    } else {
+        updateProperties = {
+            left: parseInt( originWindow.left, 10 ),
+            top: parseInt( originWindow.top, 10 ),
+            width: parseInt( originWindow.width, 10 ),
+            height: parseInt( originWindow.height, 10 )
+        }
+    };
+
     if( windowId === alternateWindow.id ){
-        chrome.windows.update( originWindow.id, {
-            left: originWindow.left,
-            top: originWindow.top,
-            width: originWindow.width,
-            height: originWindow.height,
-            focused: originWindow.focused
-        } );
+        chrome.windows.update( originWindow.id, updateProperties );
 
         alternateWindow = false;
     } else if ( windowId === originWindow.id && alternateWindow.id ){
-        chrome.windows.update( alternateWindow.id, {
-            left: originWindow.left,
-            top: originWindow.top,
-            width: originWindow.width,
-            height: originWindow.height,
-            focused: originWindow.focused
-        } );
+        chrome.windows.update( alternateWindow.id, updateProperties );
 
         alternateWindow = false;
     }
