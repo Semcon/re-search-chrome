@@ -1,5 +1,6 @@
 (function(){
     var tipUrl = 'http://example.com';
+    var transformString = 'transform: matrix3d(1,0,0.00,0,0.00,1,0.00,0,0,0,1,0,0,60,0,1);';
 
     function getSelectList( terms ){
         var selectList = document.createElement( 'select');
@@ -280,9 +281,9 @@
             currentStyle = body.children[ i ].getAttribute( 'style' );
 
             if( !currentStyle ){
-                newStyle = 'transform: translateY( 60px );';
+                newStyle = transformString;
             } else {
-                newStyle = currentStyle + '; transform: translateY( 60px );';
+                newStyle = currentStyle + '; ' + transformString;
             }
 
             body.children[ i ].setAttribute( 'style', newStyle );
@@ -298,14 +299,12 @@
 
         for( var i = 0; i < body.children.length; i = i + 1 ){
             currentStyle = body.children[ i ].getAttribute( 'style' );
+            
+            if( currentStyle ){
+                newStyle = currentStyle.replace( transformString, '' );
 
-            if( !currentStyle ){
-                newStyle = 'transform: translateY( 0px );';
-            } else {
-                newStyle = currentStyle + '; transform: translateY( 0px );';
+                body.children[ i ].setAttribute( 'style', newStyle );
             }
-
-            body.children[ i ].setAttribute( 'style', newStyle );
         }
 
         if( toolbar ){
