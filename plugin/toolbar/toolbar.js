@@ -1,5 +1,7 @@
 (function(){
-    var tipUrl = 'http://example.com';
+    var tipUrl = 'http://semcon.com/re-search-tip';
+    var shareUrl = 'http://semcon.com/re-search';
+    var shareTitle = 'Re-Search';
     var transformString = 'transform: matrix3d(1,0,0.00,0,0.00,1,0.00,0,0,0,1,0,0,60,0,1);';
 
     function getSelectList( terms ){
@@ -38,7 +40,7 @@
         shareWrapper.appendChild( shareButton );
 
         var shareLinkedin = document.createElement( 'a' );
-        shareLinkedin.setAttribute( 'href', 'https://www.linkedin.com/shareArticle?url=http://example.com&title=Example' );
+        shareLinkedin.setAttribute( 'href', 'https://www.linkedin.com/shareArticle?url=' + shareUrl + '&title=' + shareTitle );
         shareLinkedin.className = 're-search-share-linkedin re-search-hidden';
         shareLinkedin.setAttribute( 'target', '_BLANK' );
 
@@ -51,7 +53,7 @@
         shareWrapper.appendChild( shareLinkedin );
 
         var shareFacebook = document.createElement( 'a' );
-        shareFacebook.setAttribute( 'href', 'https://www.facebook.com/sharer.php?u=http://example.com' );
+        shareFacebook.setAttribute( 'href', 'https://www.facebook.com/sharer.php?u=' + shareUrl );
         shareFacebook.className = 're-search-share-facebook re-search-hidden';
         shareFacebook.setAttribute( 'target', '_BLANK' );
 
@@ -64,7 +66,7 @@
         shareWrapper.appendChild( shareFacebook );
 
         var shareTwitter = document.createElement( 'a' );
-        shareTwitter.setAttribute( 'href', ' https://twitter.com/intent/tweet?url=http://example.com&text=Example' );
+        shareTwitter.setAttribute( 'href', 'https://twitter.com/intent/tweet?url=' + shareUrl + '&text=' + shareTitle );
         shareTwitter.className = 're-search-share-twitter re-search-hidden';
         shareTwitter.setAttribute( 'target', '_BLANK' );
 
@@ -155,7 +157,7 @@
         var readMoreButton = document.createElement( 'a' );
         readMoreButton.className = 're-search-read-more-button';
         readMoreButton.innerText = 'Read more';
-        readMoreButton.href = 'http://semcon.com';
+        readMoreButton.href = shareUrl;
 
         toolbar.appendChild( readMoreButton );
 
@@ -299,7 +301,7 @@
 
         for( var i = 0; i < body.children.length; i = i + 1 ){
             currentStyle = body.children[ i ].getAttribute( 'style' );
-            
+
             if( currentStyle ){
                 newStyle = currentStyle.replace( transformString, '' );
 
