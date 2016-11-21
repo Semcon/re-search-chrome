@@ -12,7 +12,7 @@ var originWindow = false;
 var originTabId = false;
 
 var DATA_URL = 'https://api.myjson.com/bins/1bv2i';
-var TIP_URL = 'http://example.com';
+var TIP_URL = 'http://semcon.com/re-search-tip';
 
 //First time running script to check what value showBar is in chrome storage.
 //If showBar is undefined it is gets set to enabled otherwise it gets the value.
