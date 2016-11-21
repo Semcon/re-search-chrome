@@ -43,7 +43,7 @@ chrome.windows.onRemoved.addListener( function( windowId ){
             width: parseInt( originWindow.width, 10 ),
             height: parseInt( originWindow.height, 10 )
         }
-    };
+    }
 
     if( windowId === alternateWindow.id ){
         chrome.windows.update( originWindow.id, updateProperties );
@@ -327,7 +327,7 @@ chrome.runtime.onMessage.addListener(
 
                 if( betterTerm ){
                     showWindows( request.term, betterTerm, sender.tab.windowId );
-                };
+                }
 
                 break;
             case 'updateTabURL':

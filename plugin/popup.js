@@ -33,7 +33,7 @@
         }
     });
 
-    chrome.runtime.onMessage.addListener( function( request, sender, sendResponse ){
+    chrome.runtime.onMessage.addListener( function( request ){
         switch( request.action ){
             case 'enableToolbar':
                 document.querySelector( '.re-search-yes-no-toggle' ).classList.add( 'enabled' );

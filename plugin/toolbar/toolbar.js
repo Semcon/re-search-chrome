@@ -1,5 +1,4 @@
 (function(){
-    var tipUrl = 'http://semcon.com/re-search-tip';
     var shareUrl = 'http://semcon.com/re-search';
     var shareTitle = 'Re-Search';
     var transformString = 'transform: matrix3d(1,0,0.00,0,0.00,1,0.00,0,0,0,1,0,0,60,0,1);';
@@ -238,8 +237,8 @@
         window.addEventListener( 'click', function( event ){
             if( event.target.classList.contains( 're-search-hide-button' ) || event.target.classList.contains( 're-search-hide-icon' ) ){
                 chrome.runtime.sendMessage({
-        			action: 'disableToolbar'
-        		});
+                    action: 'disableToolbar'
+                });
             }
         });
 
@@ -298,6 +297,8 @@
     function removeToolbar(){
         var body = document.querySelectorAll( 'body' )[ 0 ];
         var toolbar = document.getElementById( 're-search-toolbar' );
+        var currentStyle;
+        var newStyle;
 
         for( var i = 0; i < body.children.length; i = i + 1 ){
             currentStyle = body.children[ i ].getAttribute( 'style' );
