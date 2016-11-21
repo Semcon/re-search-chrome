@@ -35,4 +35,3 @@ If you find anything more you think we should test then please just let us know 
 | The drop-down should go back to it's original state when closed | ✓ |
 | When choosing a term in the drop-down the page should do a search for that term | ✓ |
 | When searching for a new term from the drop-down the alternate window should work the same as when searching in any other way | ✓ |
-| Drop down-menyn ska stänga och gå tillbaka till rubrik när man klickat på ett alternativ | ✓ |
