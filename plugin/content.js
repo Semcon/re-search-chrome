@@ -14,6 +14,10 @@
             return false;
         }
 
+        if( !term ){
+            return false;
+        }
+
         lastSentTerm = term;
 
         chrome.runtime.sendMessage({
