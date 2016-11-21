@@ -11,6 +11,10 @@ the original search better represents the real world demographic.
 We've decided to publish this early because we believe this project can benefit from being
 available in the public realm.
 
+## Tests
+At the moment we do manual testing.  
+[Here's the result of the latest run.](TESTS.md)
+
 ## Known bugs
  * If you close the right side window and the try to search "again" in the main window nothing will happen. This is due to the search-engine not actually updating anything if you search again for the same thing.
 
