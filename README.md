@@ -16,7 +16,7 @@ At the moment we do manual testing.
 [Here's the result of the latest run.](TESTS.md)
 
 ## Known bugs
- * If you close the right side window and the try to search "again" in the main window nothing will happen. This is due to the search-engine not actually updating anything if you search again for the same thing.
+ * If you close the right side window and then try to search "again" in the main window nothing will happen. This is due to the search-engine not actually updating anything if you search again for the same thing.
 
 ## Disclaimer
 
