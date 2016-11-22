@@ -13,7 +13,6 @@ At the moment we do manual testing.
 [Here's the result of the latest run.](TESTS.md)
 
 ## Contributing
-
 If you find something you want to update please open an issue or even better, a pull request.   
 We are always open to contributions.
 
