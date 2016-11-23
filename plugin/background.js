@@ -109,7 +109,7 @@ function sendTip(){
         }
     }
 
-    xhr.send( 'term=' + latestTerm );
+    xhr.send( 'term=' + encodeURIComponent( latestTerm ).replace( /%20/g, '+' ) );
 }
 
 function showWindows( term, newTerm, windowOriginId ){
