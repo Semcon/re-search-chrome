@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Re-Search",
-    "version": "0.4.5",
+    "version": "0.4.6",
     "description": "This extension shows an alternative result when doing a Google or Bing image search.",
     "web_accessible_resources": [
         "icons/*"
