@@ -90,14 +90,20 @@ chrome.tabs.onRemoved.addListener( function( tabId ){
     }
 });
 
-var xhr = new XMLHttpRequest();
-xhr.open( 'GET', DATA_URL, true );
-xhr.onreadystatechange = function() {
-    if ( xhr.readyState === 4 && xhr.status === 200 ) {
-        jsonData = JSON.parse( xhr.responseText );
+function loadTerms(){
+    var xhr = new XMLHttpRequest();
+    xhr.open( 'GET', DATA_URL, true );
+    xhr.onreadystatechange = function() {
+        if ( xhr.readyState === 4 && xhr.status === 200 ) {
+            jsonData = JSON.parse( xhr.responseText );
+        }
     }
+
+    xhr.send();
 }
-xhr.send();
+
+loadTerms();
+setInterval( loadTerms, 21600000 );
 
 function sendTip(){
     var xhr = new XMLHttpRequest();
