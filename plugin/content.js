@@ -81,8 +81,6 @@
     function getSearchTerm(){
         elements = document.querySelectorAll( inputSelector );
         if( elements.length === 0 ){
-            setTimeout( getSearchTerm, 100 );
-
             return false;
         }
 
@@ -91,7 +89,19 @@
             return element.value;
         }
 
-        return false;
+        return '';
+    }
+
+    function sendStartTerm(){
+        var term = getSearchTerm();
+
+        if( term === false ){
+            setTimeout( sendStartTerm, 100 );
+
+            return false;
+        }
+
+        sendTerm( term );
     }
 
     function init(){
@@ -101,8 +111,9 @@
         }
 
         titleTerm = document.getElementsByTagName( 'title' )[ 0 ].textContent;
+
         addListeners();
-        sendTerm( getSearchTerm() );
+        sendStartTerm();
     }
 
     chrome.runtime.sendMessage({
