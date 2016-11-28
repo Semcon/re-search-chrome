@@ -9,7 +9,7 @@ If you find anything more you think we should test then please just let us know 
 | Test | Status |
 |-------------------------------------------------------------------------------------------------------------------------------|--------|
 | Load terms and engines from an external JSON file | ✓ |
-| Re-load the JSON file every six hours | ✓ |
+| Re-load the JSON file every hour | ✓ |
 | It should remember settings between browser sessions | ✓ |
 | When doing a Google image search for any term defined a new window with an updated search should appear | ✓ |
 | When showing a new window, the original window and the new window should split 50/50 | ✓ |
