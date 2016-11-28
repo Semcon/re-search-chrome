@@ -127,7 +127,6 @@
     });
 
     chrome.runtime.onMessage.addListener( function( request, sender, response ){
-        console.log( 'got messagwe' );
         if( request.action === 'getTerm' ){
             response( getSearchTerm() );
         }
