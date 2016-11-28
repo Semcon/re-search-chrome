@@ -37,6 +37,7 @@ var originTabId = false;
 
 var DATA_URL = 'https://raw.githubusercontent.com/Semcon/re-search-config/master/data.json';
 var TIP_URL = 'http://semcon.com/re-search-tip/';
+var TERM_UPDATE_INTERVAL = 3600000;
 
 //First time running script to check what value showBar is in chrome storage.
 //If showBar is undefined it is gets set to enabled otherwise it gets the value.
@@ -103,7 +104,7 @@ function loadTerms(){
 }
 
 loadTerms();
-setInterval( loadTerms, 21600000 );
+setInterval( loadTerms, TERM_UPDATE_INTERVAL );
 
 function sendTip(){
     var xhr = new XMLHttpRequest();
